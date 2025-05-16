@@ -11,6 +11,8 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/to/develop-packages).
 -->
 
+# Flutter EggyByte Core
+
 <div align="center">
   <img src="https://img.shields.io/badge/version-0.0.1-green.svg" alt="Version 0.0.1">
   <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License MIT">
@@ -18,7 +20,7 @@ and the Flutter guide for
   <img src="https://img.shields.io/badge/Dart-%3E%3D2.19.0%20%3C4.0.0-purple.svg" alt="Dart >=2.19.0 <4.0.0">
 </div>
 
-# eggybyte_core
+## 📋 Overview
 
 A foundational Flutter package for EggyByte Technology, providing a collection of common utilities and core functionalities.
 
