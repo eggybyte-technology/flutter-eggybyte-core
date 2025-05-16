@@ -1,18 +1,19 @@
 name: eggybyte_core
-description: "A new Flutter package project."
+description: A foundational Flutter package for EggyByte Technology, providing a collection of common utilities and core functionalities.
 version: 0.0.1
 homepage:
 
 environment:
-  sdk: ^3.9.0-63.0.dev
+  sdk: '>=2.19.0 <4.0.0'
   flutter: ">=1.17.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  intl: ^0.20.2
-  http: ^1.4.0
-  path_provider: ^2.1.5
+  http: ^1.4.0 # For NetworkUtils
+  # shared_preferences: ^2.0.0 # Example for StorageUtils (key-value)
+  path_provider: ^2.1.5 # Example for StorageUtils (file system)
+  intl: ^0.20.2 # For date/time formatting
 
 dev_dependencies:
   flutter_test:
