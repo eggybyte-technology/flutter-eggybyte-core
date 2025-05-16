@@ -1,0 +1,86 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# EggyByte Core Library (eggybyte_core) - Development Guidelines
+
+## 1. Project Overview
+
+`eggybyte_core` is a foundational Flutter package for EggyByte Technology, providing a collection of common utilities and core functionalities.
+
+**Core Principle:** Wherever possible, this library should integrate and utilize pre-existing, verified implementations from EggyByte Technology's internal resources rather than reimplementing functionality from scratch.
+
+## 2. Coding Standards
+
+### 2.1. Language and Comments
+*   **Code, Comments, Logs:** All code, inline comments, documentation blocks, and log messages MUST be written in **English**.
+*   **User-Facing UI:** Any UI elements or messages intended for end-users (if applicable from this core library) MUST be in **Chinese**.
+
+### 2.2. Code Structure
+*   **Static Implementation:** All utility methods MUST be implemented as `static` methods within `static` (or effectively static, e.g., uninstantiable) classes. Avoid instance-based utility classes.
+    *   Example: `MyUtils.doSomething()`
+
+### 2.3. Logging
+*   **Mandatory Logging:** Implement comprehensive logging within all methods to facilitate debugging and traceability.
+*   **Centralized Logging Utility:** All logging MUST utilize the dedicated `Logging` utility provided within this core library (see section 3.1).
+
+## 3. Functional Requirements & Key Modules
+
+### 3.1. Unified Logging (`LoggingUtils`)
+
+A centralized logging utility is required.
+*   **Log Format:** All log messages MUST adhere to the format: `time [log_type] message`
+    *   `time`: Timestamp of the log event. Should be displayed in a **gray** color.
+    *   `[log_type]`: Type of the log (e.g., INFO, WARNING, ERROR, DEBUG). The `log_type` and `message` part should use a **bright color** specific to the log type.
+    *   `message`: The actual log content. Important keywords or data within the message should be **bolded** for emphasis.
+*   **Error Log Handling:** Error logs (`ERROR` type) MUST be handled distinctively to be easily identifiable and provide maximum debugging information (e.g., stack trace, context).
+*   **Dependency:** All other modules and functionalities within `eggybyte_core` MUST use this logging utility for outputting logs.
+
+### 3.2. Networking (`NetworkUtils`)
+
+#### 3.2.1. HTTP Client
+*   Provide static methods for common HTTP requests:
+    *   `get(String url, {Map<String, String>? headers, Map<String, dynamic>? queryParameters})`
+    *   `post(String url, {Map<String, String>? headers, dynamic body, Map<String, dynamic>? queryParameters})`
+    *   (Consider other methods like PUT, DELETE as needed)
+*   Allow customization of `headers` and `body` for requests.
+*   **Bearer Token Authentication:** Include a method to globally set and manage a Bearer token for authenticating API requests.
+    *   `setBearerToken(String token)`
+    *   `clearBearerToken()`
+
+#### 3.2.2. WebSocket Client
+*   Provide functionality to establish and manage WebSocket connections.
+*   Methods for connecting, sending messages, receiving messages, and disconnecting.
+
+### 3.3. Screen Utilities (`ScreenUtils`)
+
+*   **Device Screen Dimensions:**
+    *   `getDeviceScreenWidth()`: Returns the physical width of the device screen.
+    *   `getDeviceScreenHeight()`: Returns the physical height of the device screen.
+*   **Current Context Dimensions (Flutter specific):**
+    *   `getContextWidth(BuildContext context)`: Returns the width of the current widget's `BuildContext`.
+    *   `getContextHeight(BuildContext context)`: Returns the height of the current widget's `BuildContext`.
+
+### 3.4. Storage Utilities (`StorageUtils`)
+
+*   **Persistent File Storage:**
+    *   `saveToFile(String fileName, String content)`: Persistently saves string content to a specified file.
+    *   `readFromFile(String fileName)`: Reads and returns string content from a specified file. Handle file not found scenarios gracefully.
+    *   Ensure this is platform-agnostic if possible, or clearly define platform-specific behavior.
+
+### 3.5. Formatting Utilities (`FormatUtils`)
+
+#### 3.5.1. Time Formatting
+*   `formatTimeSymbolSeparated(DateTime time, String separator = ':')`: e.g., "14:30:55"
+*   `formatTimeChineseSeparated(DateTime time)`: e.g., "14时30分55秒"
+
+#### 3.5.2. Date Formatting
+*   `formatDateSymbolSeparated(DateTime date, String separator = '-')`: e.g., "2023-10-27"
+*   `formatDateChineseSeparated(DateTime date)`: e.g., "2023年10月27日"
+
+#### 3.5.3. Number Formatting
+*   `formatNumberDecimalPlaces(double number, int decimalPlaces)`: Formats a number to a specified number of decimal places.
+*   `formatNumberWithUnits(double number, {int decimalPlaces = 2})`: Formats a number using Chinese units like "万" (ten thousand) or "亿" (hundred million) appropriately.
+    *   e.g., 12000 -> "1.2万", 120000000 -> "1.2亿"
+
