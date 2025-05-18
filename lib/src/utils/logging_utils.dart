@@ -40,35 +40,41 @@ class LoggingUtils {
   }) {
     final String currentTime = _timeFormatter.format(DateTime.now());
     String logTypeString = type.toString().split('.').last.toUpperCase();
-    String coloredLogTypeMessage;
     String timeString = '$_ansiGray$currentTime$_ansiReset';
 
-    // Basic markdown-like bold processing for *word*
-    message = message.replaceAllMapped(RegExp(r'\*(.*?)\*'), (match) {
-      if (match.group(1) != null && match.group(1)!.isNotEmpty) {
-        return '$_ansiBold${match.group(1)}$_ansiReset';
+    String logColorCode;
+
+    switch (type) {
+      case LogType.info:
+        logColorCode = _ansiBrightGreen;
+        break;
+      case LogType.warning:
+        logColorCode = _ansiBrightYellow;
+        break;
+      case LogType.error:
+        logColorCode = _ansiBrightRed;
+        break;
+      case LogType.debug:
+        logColorCode = _ansiBrightBlue;
+        break;
+    }
+
+    // Process bolding: reapply logColorCode after each bold reset
+    // so that the color of the log type persists for the rest of the message.
+    message = message.replaceAllMapped(RegExp(r'\\*(.*?)\\*'), (match) {
+      final String? matchedGroup = match.group(1);
+      if (matchedGroup != null && matchedGroup.isNotEmpty) {
+        // Apply bold, then the content, then reset bold, THEN reapply the log's original color.
+        return '$_ansiBold$matchedGroup$_ansiReset$logColorCode';
       }
       return '';
     });
 
-    switch (type) {
-      case LogType.info:
-        coloredLogTypeMessage =
-            '$_ansiBrightGreen[$logTypeString] $message$_ansiReset';
-        break;
-      case LogType.warning:
-        coloredLogTypeMessage =
-            '$_ansiBrightYellow[$logTypeString] $message$_ansiReset';
-        break;
-      case LogType.error:
-        coloredLogTypeMessage =
-            '$_ansiBrightRed[$logTypeString] $message$_ansiReset';
-        break;
-      case LogType.debug:
-        coloredLogTypeMessage =
-            '$_ansiBrightBlue[$logTypeString] $message$_ansiReset';
-        break;
-    }
+    // Construct the final colored message.
+    // The logColorCode applies to the logTypeString and the processed message.
+    // The final _ansiReset resets everything at the very end.
+    final String coloredLogTypeMessage =
+        '$logColorCode[$logTypeString] $message$_ansiReset';
 
     // Using print for now. In a Flutter app, this might go to the Flutter console
     // or a more sophisticated logging framework.
@@ -77,7 +83,8 @@ class LoggingUtils {
     if (type == LogType.error) {
       // Handle error-specific logging, e.g., print stack trace
       if (stackTrace != null) {
-        print('$_ansiBrightRed${stackTrace.toString()}$_ansiReset');
+        // Ensure stack trace is also colored with the error color, and reset afterwards.
+        print('$logColorCode${stackTrace.toString()}$_ansiReset');
       }
       // Potentially log to a remote error tracking service here.
       // As per guidelines: "Error logs (ERROR type) MUST be handled distinctively

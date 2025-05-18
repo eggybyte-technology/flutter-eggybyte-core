@@ -80,7 +80,7 @@ Based on the development guidelines, this package provides the following core ut
     dependencies:
       flutter:
         sdk: flutter
-      eggybyte_core: ^0.0.1 # Replace with the latest version from pub.dev
+      eggybyte_core: ^1.0.0 # Replace with the latest version from pub.dev
     ```
 
 2.  Install the package by running the following command in your project's root directory:
@@ -152,18 +152,18 @@ Future<void> postData() async {
 
 ```dart
 // In a StatefulWidget or StatelessWidget build method:
-// @override
-// Widget build(BuildContext context) {
-//   final double deviceWidth = ScreenUtils.getDeviceScreenWidth();
-//   final double deviceHeight = ScreenUtils.getDeviceScreenHeight();
-//   LoggingUtils.info('Device Screen: ${deviceWidth}w x ${deviceHeight}h');
+@override
+Widget build(BuildContext context) {
+  final double deviceWidth = ScreenUtils.getDeviceScreenWidth();
+  final double deviceHeight = ScreenUtils.getDeviceScreenHeight();
+  LoggingUtils.info('Device Screen: ${deviceWidth}w x ${deviceHeight}h');
 
-//   final double contextWidth = ScreenUtils.getContextWidth(context);
-//   final double contextHeight = ScreenUtils.getContextHeight(context);
-//   LoggingUtils.info('Current Context: ${contextWidth}w x ${contextHeight}h');
+  final double contextWidth = ScreenUtils.getContextWidth(context);
+  final double contextHeight = ScreenUtils.getContextHeight(context);
+  LoggingUtils.info('Current Context: ${contextWidth}w x ${contextHeight}h');
    
-//   return Container(); // Your widget UI
-// }
+  return Container(); // Your widget UI
+}
 ```
 
 ### Storage Utilities Example

@@ -1,6 +1,7 @@
 name: eggybyte_core
 description: A foundational Flutter package for EggyByte Technology, providing a collection of common utilities and core functionalities.
-version: 1.0.0
+version: 1.0.1
+homepage:
 repository: https://github.com/eggybyte-technology/flutter-eggybyte-core
 
 environment:
