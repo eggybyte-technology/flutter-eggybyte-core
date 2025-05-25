@@ -11,262 +11,224 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/to/develop-packages).
 -->
 
-# Flutter EggyByte Core
+# EggyByte Core
 
-<div align="center">
-  <img src="https://img.shields.io/badge/version-0.0.1-green.svg" alt="Version 0.0.1">
-  <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License MIT">
-  <img src="https://img.shields.io/badge/Flutter-%3E%3D1.17.0-blue.svg" alt="Flutter >=1.17.0">
-  <img src="https://img.shields.io/badge/Dart-%3E%3D2.19.0%20%3C4.0.0-purple.svg" alt="Dart >=2.19.0 <4.0.0">
-</div>
+[![pub package](https://img.shields.io/pub/v/eggybyte_core.svg)](https://pub.dev/packages/eggybyte_core)
+[![style: flutter lints](https://img.shields.io/badge/style-flutter__lints-blue)](https://pub.dev/packages/flutter_lints)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## 📋 Overview
+A foundational Flutter package for EggyByte Technology, providing a collection of common utilities and core functionalities including logging, networking, screen utilities, storage, and formatting.
 
-A foundational Flutter package for EggyByte Technology, providing a collection of common utilities and core functionalities.
+## ✨ Features
 
-**Core Principle:** Wherever possible, this library should integrate and utilize pre-existing, verified implementations from EggyByte Technology's internal resources rather than reimplementing functionality from scratch.
+- **🔍 Centralized Logging**: Rich, configurable logging with color support and platform-specific native logging
+- **🌐 Network Utilities**: HTTP client with Bearer token authentication and WebSocket support  
+- **📱 Screen Utilities**: Device and context dimension helpers
+- **💾 Storage Utilities**: Persistent file storage operations
+- **📅 Format Utilities**: Time, date, and number formatting with Chinese localization
+- **⚙️ Platform Configuration**: Target platform detection and configuration
 
-## 🌟 Key Modules and Features
+## 📦 Installation
 
-Based on the development guidelines, this package provides the following core utilities:
+Add this to your package's `pubspec.yaml` file:
 
-*   **Unified Logging (`LoggingUtils`)**:
-    *   Centralized logging mechanism.
-    *   Formatted output: `time [log_type] message`.
-    *   Customizable colors for timestamp and log types.
-    *   Emphasis for important keywords within messages.
-    *   Distinct handling for error logs including stack traces.
-*   **Networking Utilities (`NetworkUtils`)**:
-    *   **HTTP Client**:
-        *   Static methods for `GET`, `POST` requests (extendable for `PUT`, `DELETE`, etc.).
-        *   Customizable headers, body, and query parameters.
-        *   Global Bearer token management: `setBearerToken(String token)`, `clearBearerToken()`.
-    *   **WebSocket Client**:
-        *   Functionality to establish and manage WebSocket connections.
-        *   Methods for connecting, sending/receiving messages, and disconnecting.
-*   **Screen Utilities (`ScreenUtils`)**:
-    *   `getDeviceScreenWidth()`: Physical width of the device screen.
-    *   `getDeviceScreenHeight()`: Physical height of the device screen.
-    *   `getContextWidth(BuildContext context)`: Width of the current widget's `BuildContext`.
-    *   `getContextHeight(BuildContext context)`: Height of the current widget's `BuildContext`.
-*   **Storage Utilities (`StorageUtils`)**:
-    *   `saveToFile(String fileName, String content)`: Persistently saves string content to a file.
-    *   `readFromFile(String fileName)`: Reads string content from a file, with graceful error handling for non-existent files.
-*   **Formatting Utilities (`FormatUtils`)**:
-    *   **Time Formatting**:
-        *   `formatTimeSymbolSeparated(DateTime time, String separator = ':')` (e.g., "14:30:55")
-        *   `formatTimeChineseSeparated(DateTime time)` (e.g., "14时30分55秒")
-    *   **Date Formatting**:
-        *   `formatDateSymbolSeparated(DateTime date, String separator = '-')` (e.g., "2023-10-27")
-        *   `formatDateChineseSeparated(DateTime date)` (e.g., "2023年10月27日")
-    *   **Number Formatting**:
-        *   `formatNumberDecimalPlaces(double number, int decimalPlaces)`
-        *   `formatNumberWithUnits(double number, {int decimalPlaces = 2})` (e.g., 12000 -> "1.2万", 120000000 -> "1.2亿")
-
-## 🚀 Getting Started
-
-### 📋 Prerequisites
-
-| Requirement | Version             | Purpose                                  |
-|-------------|---------------------|------------------------------------------|
-| Flutter SDK | `>=1.17.0`          | Flutter application development          |
-| Dart SDK    | `>=2.19.0 <4.0.0`   | Dart language support                    |
-
-### 🔧 Installation
-
-1.  Add `eggybyte_core` to your `pubspec.yaml` dependencies:
-
-    ```yaml
-    dependencies:
-      flutter:
-        sdk: flutter
-      eggybyte_core: ^1.0.0 # Replace with the latest version from pub.dev
-    ```
-
-2.  Install the package by running the following command in your project's root directory:
-
-    ```bash
-    flutter pub get
-    ```
-
-## 💻 Usage Examples
-
-Import the main library or specific utilities as needed:
-
-```dart
-// Import all utilities (assuming a central export file `eggybyte_core.dart`)
-import 'package:eggybyte_core/eggybyte_core.dart';
-
-// Or import individual utilities if preferred:
-// import 'package:eggybyte_core/src/utils/logging_utils.dart';
-// import 'package:eggybyte_core/src/utils/network_utils.dart';
-// import 'package:eggybyte_core/src/utils/screen_utils.dart';
-// import 'package:eggybyte_core/src/utils/storage_utils.dart';
-// import 'package:eggybyte_core/src/utils/format_utils.dart';
+```yaml
+dependencies:
+  eggybyte_core: ^1.0.1
 ```
 
-### Logging Example
-
-```dart
-// Ensure LoggingUtils is initialized if required by its implementation.
-LoggingUtils.info('User logged in: **user_id_123**');
-LoggingUtils.warning('Low disk space detected.');
-try {
-  throw Exception('Something went wrong!');
-} catch (e, s) {
-  LoggingUtils.error('Critical operation failed', error: e, stackTrace: s);
-}
-```
-
-### Network Example
-
-```dart
-Future<void> fetchData() async {
-  NetworkUtils.setBearerToken('your_secure_bearer_token');
-  try {
-    final response = await NetworkUtils.get(
-      'https://api.example.com/data',
-      queryParameters: {'page': '1', 'limit': '10'},
-    );
-    // Process response.data (assuming your NetworkUtils parses JSON or returns response body)
-    LoggingUtils.info('Data fetched successfully: ${response.body}');
-  } catch (e) {
-    LoggingUtils.error('Failed to fetch data', error: e);
-  }
-}
-
-Future<void> postData() async {
-  try {
-    final response = await NetworkUtils.post(
-      'https://api.example.com/submit',
-      body: {'name': 'EggyByte Core', 'status': 'active'},
-    );
-    LoggingUtils.info('Data posted, response: ${response.body}');
-  } catch (e) {
-    LoggingUtils.error('Failed to post data', error: e);
-  }
-}
-```
-
-### Screen Utilities Example (within a Flutter Widget)
-
-```dart
-// In a StatefulWidget or StatelessWidget build method:
-@override
-Widget build(BuildContext context) {
-  final double deviceWidth = ScreenUtils.getDeviceScreenWidth();
-  final double deviceHeight = ScreenUtils.getDeviceScreenHeight();
-  LoggingUtils.info('Device Screen: ${deviceWidth}w x ${deviceHeight}h');
-
-  final double contextWidth = ScreenUtils.getContextWidth(context);
-  final double contextHeight = ScreenUtils.getContextHeight(context);
-  LoggingUtils.info('Current Context: ${contextWidth}w x ${contextHeight}h');
-   
-  return Container(); // Your widget UI
-}
-```
-
-### Storage Utilities Example
-
-```dart
-Future<void> manageLocalData() async {
-  const String myFile = 'user_settings.json';
-  final String settingsJson = '{"theme": "dark", "notifications": true}';
-
-  bool saved = await StorageUtils.saveToFile(myFile, settingsJson);
-  if (saved) {
-    LoggingUtils.info('Settings saved to $myFile');
-  } else {
-    LoggingUtils.error('Failed to save settings to $myFile');
-  }
-
-  String? retrievedSettings = await StorageUtils.readFromFile(myFile);
-  if (retrievedSettings != null) {
-    LoggingUtils.info('Retrieved settings: $retrievedSettings');
-  } else {
-    LoggingUtils.warning('No settings found in $myFile or failed to read.');
-  }
-}
-```
-
-### Formatting Utilities Example
-
-```dart
-void demonstrateFormatting() {
-  final DateTime now = DateTime.now();
-
-  LoggingUtils.info('Time (Symbol): ${FormatUtils.formatTimeSymbolSeparated(now)}');
-  LoggingUtils.info('Time (Chinese): ${FormatUtils.formatTimeChineseSeparated(now)}');
-
-  LoggingUtils.info('Date (Symbol): ${FormatUtils.formatDateSymbolSeparated(now)}');
-  LoggingUtils.info('Date (Chinese): ${FormatUtils.formatDateChineseSeparated(now)}');
-
-  double complexNumber = 1234567.8912;
-  LoggingUtils.info('Number (2 Decimals): ${FormatUtils.formatNumberDecimalPlaces(complexNumber, 2)}');
-  LoggingUtils.info('Number (Units): ${FormatUtils.formatNumberWithUnits(complexNumber)}'); // e.g., 123.46万
-  LoggingUtils.info('Number (Units Large): ${FormatUtils.formatNumberWithUnits(123456789.0)}'); // e.g., 1.23亿
-}
-```
-*(Note: Actual implementation of these examples depends on the final utility method signatures and error handling.)*
-
-## 📚 API Documentation
-
-Detailed API documentation can be generated using the standard Dart documentation tool:
+Then run:
 
 ```bash
-dart doc .
+flutter pub get
 ```
 
-This will generate an HTML documentation site in the `doc/api` directory.
-When published to [pub.dev](https://pub.dev/), the API documentation will also be available there.
+## 🚀 Quick Start
 
-## 📁 Project Structure
+```dart
+import 'package:eggybyte_core/eggybyte_core.dart';
 
+void main() {
+  // Configure the core library
+  EggyByteCore.setTargetPlatform(TargetPlatform.android);
+  EggyByteCore.configureLogging(
+    enableColors: true,
+    enableBold: true,
+  );
+
+  // Start using the utilities
+  LoggingUtils.info('Application *started* successfully!');
+}
 ```
-eggybyte_core/
-├── .dart_tool/
-├── .idea/
-├── lib/
-│   ├── eggybyte_core.dart    # Main export file for the package
-│   └── src/                  # Internal source code
-│       ├── utils/            # Core utility modules
-│       │   ├── format_utils.dart
-│       │   ├── logging_utils.dart
-│       │   ├── network_utils.dart
-│       │   ├── screen_utils.dart
-│       │   └── storage_utils.dart
-│       └── ...               # Other internal components (e.g., models, constants)
-├── test/                     # Unit and widget tests
-├── .gitignore
-├── analysis_options.yaml
-├── CHANGELOG.md
-├── LICENSE                   # MIT License file
-├── pubspec.lock
-├── pubspec.yaml              # Package manifest
-└── README.md                 # This file
+
+## 📖 Documentation
+
+### Configuration
+
+#### Platform Setup
+```dart
+// Set the target platform
+EggyByteCore.setTargetPlatform(TargetPlatform.android);
+
+// Configure logging appearance
+EggyByteCore.configureLogging(
+  enableColors: true,  // Enable ANSI colors (disable for some IDEs)
+  enableBold: true,    // Enable bold text formatting
+);
 ```
+
+### Logging Utilities
+
+#### Basic Logging
+```dart
+// Standard log levels
+LoggingUtils.info('This is an *info* message');
+LoggingUtils.warning('This is a *warning* message');
+LoggingUtils.error('This is an *error* message');
+LoggingUtils.debug('This is a *debug* message');
+```
+
+#### Native Platform Logging
+```dart
+// Log with platform prefix
+LoggingUtils.nativeInfo('SDK initialized', platformPrefix: 'ANDROID NATIVE');
+LoggingUtils.nativeError('Connection failed', platformPrefix: 'IOS NATIVE');
+
+// Or use the configured platform automatically
+final prefix = EggyByteCore.getPlatformPrefix(); // Returns "ANDROID NATIVE"
+LoggingUtils.nativeDebug('Native method called', platformPrefix: prefix);
+```
+
+### Network Utilities
+
+#### HTTP Operations
+```dart
+// Set Bearer token for authentication
+NetworkUtils.setBearerToken('your-auth-token');
+
+// GET request
+final response = await NetworkUtils.get(
+  'https://api.example.com/data',
+  queryParameters: {'page': '1', 'limit': '10'},
+);
+
+// POST request
+final postResponse = await NetworkUtils.post(
+  'https://api.example.com/users',
+  body: {'name': 'John', 'email': 'john@example.com'},
+);
+
+// Clear token when needed
+NetworkUtils.clearBearerToken();
+```
+
+### Screen Utilities
+
+```dart
+// Get device screen dimensions
+final screenWidth = ScreenUtils.getDeviceScreenWidth();
+final screenHeight = ScreenUtils.getDeviceScreenHeight();
+
+// Get context dimensions (in a Widget)
+class MyWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final contextWidth = ScreenUtils.getContextWidth(context);
+    final contextHeight = ScreenUtils.getContextHeight(context);
+    
+    return Container(
+      width: contextWidth * 0.8,
+      height: contextHeight * 0.6,
+      child: Text('Responsive Widget'),
+    );
+  }
+}
+```
+
+### Storage Utilities
+
+```dart
+// Save data to file
+await StorageUtils.saveToFile('user_data.json', jsonEncode(userData));
+
+// Read data from file
+final content = await StorageUtils.readFromFile('user_data.json');
+if (content != null) {
+  final userData = jsonDecode(content);
+}
+
+// Delete file
+final deleted = await StorageUtils.deleteFile('temp_data.txt');
+```
+
+### Format Utilities
+
+#### Time Formatting
+```dart
+final now = DateTime.now();
+
+// Symbol-separated time: "14:30:55"
+final timeSymbol = FormatUtils.formatTimeSymbolSeparated(now);
+
+// Chinese time format: "14时30分55秒"
+final timeChinese = FormatUtils.formatTimeChineseSeparated(now);
+```
+
+#### Date Formatting
+```dart
+final today = DateTime.now();
+
+// Symbol-separated date: "2023-10-27"
+final dateSymbol = FormatUtils.formatDateSymbolSeparated(today);
+
+// Chinese date format: "2023年10月27日"
+final dateChinese = FormatUtils.formatDateChineseSeparated(today);
+```
+
+#### Number Formatting
+```dart
+// Decimal places: "123.46"
+final formatted = FormatUtils.formatNumberDecimalPlaces(123.456, 2);
+
+// Chinese units: "1.2万", "1.5亿"
+final withUnits1 = FormatUtils.formatNumberWithUnits(12000); // "1.20万"
+final withUnits2 = FormatUtils.formatNumberWithUnits(150000000); // "1.50亿"
+```
+
+## 🎯 Platform Support
+
+- ✅ Android
+- ✅ iOS  
+- ✅ Web
+- ✅ Windows
+- ✅ macOS
+- ✅ Linux
 
 ## 🤝 Contributing
 
-Contributions are welcome! If you'd like to contribute, please follow these steps:
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
-1.  **Adhere to Guidelines**: Ensure your contributions align with the `eggybyte_core_guidelines.mdc` and coding standards (English for code/comments, static utils, logging).
-2.  **Fork the Repository**: Click the 'Fork' button at the top right of this page.
-3.  **Clone Your Fork**: `git clone https://github.com/YOUR_USERNAME/eggybyte_core.git`
-4.  **Create a Branch**: `git checkout -b feature/your-amazing-feature`
-5.  **Make Your Changes**: Implement your feature or bug fix.
-6.  **Add Logging**: Ensure comprehensive logging is added for new functionalities as per guidelines.
-7.  **Test Your Changes**: Add relevant tests and ensure all tests pass.
-8.  **Commit Your Changes**: `git commit -m 'feat: Add some amazing feature'` (follow conventional commit messages if applicable).
-9.  **Push to the Branch**: `git push origin feature/your-amazing-feature`
-10. **Open a Pull Request**: Go to the original repository and open a new pull request.
+### Development Guidelines
 
-## 📜 License
+1. **Language**: All code, comments, and logs must be in English
+2. **Architecture**: All utilities must be implemented as static methods
+3. **Logging**: All methods must use the centralized `LoggingUtils`
+4. **Testing**: Write comprehensive tests for new features
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🏢 About EggyByte Technology
+
+EggyByte Technology is committed to creating high-quality, reusable Flutter components and utilities. This core library serves as the foundation for our Flutter applications and packages.
+
+## 📞 Support
+
+- 📧 Email: support@eggybyte.tech
+- 🐛 Issues: [GitHub Issues](https://github.com/eggybyte-technology/flutter-eggybyte-core/issues)
+- 📖 Documentation: [API Reference](https://pub.dev/documentation/eggybyte_core/latest/)
 
 ---
 
-<div align="center">
-  <p>Developed by EggyByte Technology • 2025</p>
-</div>
+Made with ❤️ by [EggyByte Technology](https://github.com/eggybyte-technology)

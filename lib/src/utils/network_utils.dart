@@ -27,7 +27,7 @@ class NetworkUtils {
     Map<String, String>? additionalHeaders,
   }) {
     final headers = <String, String>{
-      'Content-Type': 'application/json; charset=UTF-_8',
+      'Content-Type': 'application/json; charset=UTF-8',
     };
     if (_bearerToken != null) {
       headers['Authorization'] = 'Bearer $_bearerToken';
@@ -99,6 +99,7 @@ class NetworkUtils {
   /// This section would include methods for connecting, sending messages,
   /// receiving messages, and disconnecting WebSocket connections.
   /// Example:
+  /// ```dart
   /// static Future<WebSocketChannel> connectWebSocket(String url) async {
   ///   LoggingUtils.info('Attempting to connect to WebSocket: $url');
   ///   // Implementation using package:web_socket_channel or similar
@@ -107,6 +108,7 @@ class NetworkUtils {
   ///   // return channel;
   ///   throw UnimplementedError('WebSocket connect has not been implemented yet.');
   /// }
+  /// ```
 
   static void _logResponse(http.Response response) {
     if (response.body.isNotEmpty) {

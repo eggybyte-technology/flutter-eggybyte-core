@@ -30,7 +30,7 @@ class FormatUtils {
     final hour = time.hour.toString().padLeft(2, '0');
     final minute = time.minute.toString().padLeft(2, '0');
     final second = time.second.toString().padLeft(2, '0');
-    final formattedTime = '${hour}时${minute}分${second}秒';
+    final formattedTime = '$hour时$minute分$second秒';
     LoggingUtils.debug(
       'Formatted time with Chinese separator: *$formattedTime*',
     );
@@ -59,7 +59,7 @@ class FormatUtils {
     final year = date.year.toString();
     final month = date.month.toString().padLeft(2, '0');
     final day = date.day.toString().padLeft(2, '0');
-    final formattedDate = '${year}年${month}月${day}日';
+    final formattedDate = '$year年$month月$day日';
     LoggingUtils.debug(
       'Formatted date with Chinese separator: *$formattedDate*',
     );

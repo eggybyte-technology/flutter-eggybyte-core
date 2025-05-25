@@ -25,6 +25,22 @@ class LoggingUtils {
 
   static final DateFormat _timeFormatter = DateFormat('HH:mm:ss.SSS');
 
+  // Configuration flags
+  static bool _enableColors = true;
+  static bool _enableBold = true;
+
+  /// Configures the formatting options for logging
+  ///
+  /// [enableColors]: Whether to enable ANSI color codes
+  /// [enableBold]: Whether to enable bold text formatting
+  static void configureFormatting({
+    bool enableColors = true,
+    bool enableBold = true,
+  }) {
+    _enableColors = enableColors;
+    _enableBold = enableBold;
+  }
+
   /// Logs a message with a specified log type.
   ///
   /// The log format is: time [log_type] message
@@ -40,56 +56,102 @@ class LoggingUtils {
   }) {
     final String currentTime = _timeFormatter.format(DateTime.now());
     String logTypeString = type.toString().split('.').last.toUpperCase();
-    String timeString = '$_ansiGray$currentTime$_ansiReset';
 
+    String timeString;
     String logColorCode;
+    String coloredLogTypeMessage;
 
-    switch (type) {
-      case LogType.info:
-        logColorCode = _ansiBrightGreen;
-        break;
-      case LogType.warning:
-        logColorCode = _ansiBrightYellow;
-        break;
-      case LogType.error:
-        logColorCode = _ansiBrightRed;
-        break;
-      case LogType.debug:
-        logColorCode = _ansiBrightBlue;
-        break;
-    }
+    if (_enableColors) {
+      timeString = '$_ansiGray$currentTime$_ansiReset';
 
-    // Process bolding: reapply logColorCode after each bold reset
-    // so that the color of the log type persists for the rest of the message.
-    message = message.replaceAllMapped(RegExp(r'\\*(.*?)\\*'), (match) {
-      final String? matchedGroup = match.group(1);
-      if (matchedGroup != null && matchedGroup.isNotEmpty) {
-        // Apply bold, then the content, then reset bold, THEN reapply the log's original color.
-        return '$_ansiBold$matchedGroup$_ansiReset$logColorCode';
+      switch (type) {
+        case LogType.info:
+          logColorCode = _ansiBrightGreen;
+          break;
+        case LogType.warning:
+          logColorCode = _ansiBrightYellow;
+          break;
+        case LogType.error:
+          logColorCode = _ansiBrightRed;
+          break;
+        case LogType.debug:
+          logColorCode = _ansiBrightBlue;
+          break;
       }
-      return '';
-    });
 
-    // Construct the final colored message.
-    // The logColorCode applies to the logTypeString and the processed message.
-    // The final _ansiReset resets everything at the very end.
-    final String coloredLogTypeMessage =
-        '$logColorCode[$logTypeString] $message$_ansiReset';
+      // Process bolding: reapply logColorCode after each bold reset
+      // so that the color of the log type persists for the rest of the message.
+      if (_enableBold) {
+        message = message.replaceAllMapped(RegExp(r'\*(.*?)\*'), (match) {
+          final String? matchedGroup = match.group(1);
+          if (matchedGroup != null && matchedGroup.isNotEmpty) {
+            // Apply bold, then the content, then reset bold, THEN reapply the log's original color.
+            return '$_ansiBold$matchedGroup$_ansiReset$logColorCode';
+          }
+          return '';
+        });
+      } else {
+        // Remove asterisks without applying bold formatting
+        message = message.replaceAll(RegExp(r'\*(.*?)\*'), r'$1');
+      }
+
+      // Construct the final colored message.
+      coloredLogTypeMessage =
+          '$logColorCode[$logTypeString] $message$_ansiReset';
+    } else {
+      // No colors, plain text format
+      timeString = currentTime;
+
+      if (_enableBold) {
+        // Keep asterisks for bold indication in plain text
+        message = message.replaceAll(RegExp(r'\*(.*?)\*'), r'**$1**');
+      } else {
+        // Remove asterisks completely
+        message = message.replaceAll(RegExp(r'\*(.*?)\*'), r'$1');
+      }
+
+      coloredLogTypeMessage = '[$logTypeString] $message';
+    }
 
     // Using print for now. In a Flutter app, this might go to the Flutter console
     // or a more sophisticated logging framework.
+    // ignore: avoid_print
     print('$timeString $coloredLogTypeMessage');
 
     if (type == LogType.error) {
       // Handle error-specific logging, e.g., print stack trace
       if (stackTrace != null) {
-        // Ensure stack trace is also colored with the error color, and reset afterwards.
-        print('$logColorCode${stackTrace.toString()}$_ansiReset');
+        if (_enableColors) {
+          // Ensure stack trace is also colored with the error color, and reset afterwards.
+          // ignore: avoid_print
+          print('$_ansiBrightRed${stackTrace.toString()}$_ansiReset');
+        } else {
+          // ignore: avoid_print
+          print(stackTrace.toString());
+        }
       }
       // Potentially log to a remote error tracking service here.
       // As per guidelines: "Error logs (ERROR type) MUST be handled distinctively
       // to be easily identifiable and provide maximum debugging information".
     }
+  }
+
+  /// Logs a native platform message with platform prefix
+  ///
+  /// [message]: The log message
+  /// [platformPrefix]: Platform identifier (e.g., "ANDROID NATIVE", "IOS NATIVE")
+  /// [type]: The log type (defaults to info)
+  static void logNative(
+    String message, {
+    String? platformPrefix,
+    LogType type = LogType.info,
+    StackTrace? stackTrace,
+  }) {
+    final String prefixedMessage = platformPrefix != null
+        ? '[$platformPrefix] $message'
+        : '[NATIVE] $message';
+
+    log(prefixedMessage, type: type, stackTrace: stackTrace);
   }
 
   // Convenience methods for each log type
@@ -113,5 +175,31 @@ class LoggingUtils {
   /// Logs a debug message.
   static void debug(String message) {
     log(message, type: LogType.debug);
+  }
+
+  // Native logging convenience methods
+
+  /// Logs a native info message
+  static void nativeInfo(String message, {String? platformPrefix}) {
+    logNative(message, platformPrefix: platformPrefix, type: LogType.info);
+  }
+
+  /// Logs a native warning message
+  static void nativeWarning(String message, {String? platformPrefix}) {
+    logNative(message, platformPrefix: platformPrefix, type: LogType.warning);
+  }
+
+  /// Logs a native error message
+  static void nativeError(String message,
+      {String? platformPrefix, StackTrace? stackTrace}) {
+    logNative(message,
+        platformPrefix: platformPrefix,
+        type: LogType.error,
+        stackTrace: stackTrace);
+  }
+
+  /// Logs a native debug message
+  static void nativeDebug(String message, {String? platformPrefix}) {
+    logNative(message, platformPrefix: platformPrefix, type: LogType.debug);
   }
 }

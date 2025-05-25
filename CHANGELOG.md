@@ -1,3 +1,46 @@
+## 1.0.2
+
+### Added
+- **Platform Configuration**: 
+  - Added `EggyByteCore` main configuration class with platform detection support
+  - New `TargetPlatform` enum supporting Android, iOS, Web, Windows, macOS, and Linux
+  - Added `setTargetPlatform()` and `getTargetPlatform()` methods for platform management
+- **Enhanced Logging System**:
+  - Added `configureLogging()` method to control color and bold formatting
+  - Implemented native platform logging with `logNative()` and convenience methods
+  - Added platform prefix support for native logs (e.g., "ANDROID NATIVE", "IOS NATIVE")
+  - Fixed ANSI escape sequence display issues in macOS iOS debugging environment
+  - Made color and bold formatting configurable to address compatibility issues with different IDEs
+- **Improved Developer Experience**:
+  - Enhanced logging with configurable formatting to prevent visual clutter in incompatible terminals
+  - Added native logging methods: `nativeInfo()`, `nativeWarning()`, `nativeError()`, `nativeDebug()`
+  - Better error handling and graceful fallbacks for unsupported terminal features
+- **Comprehensive Test Suite**:
+  - Added extensive tests for `EggyByteCore` configuration functionality
+  - Enhanced `LoggingUtils` tests including native logging features
+  - Extended `FormatUtils` tests with edge cases and negative decimal handling
+  - Improved `NetworkUtils` tests with better token management coverage
+  - Added integration tests demonstrating cross-utility functionality
+  - Platform switching tests validating all supported platforms
+
+### Fixed
+- Resolved ANSI escape sequence display issues when debugging iOS apps on macOS
+- Fixed log formatting inconsistencies across different development environments
+- Improved color code handling for terminals that don't support ANSI formatting
+
+### Changed
+- Updated minimum Flutter version requirement to 3.0.0
+- Enhanced pubspec.yaml with better metadata and platform support information
+- Improved README.md with comprehensive documentation and usage examples
+
+### Technical Improvements
+- Added configuration flags for color and bold text support
+- Implemented conditional formatting based on environment capabilities
+- Enhanced error logging with better stack trace handling
+- Improved code organization with better separation of concerns
+- Comprehensive test coverage for all new features
+- 37 passing unit tests covering all utility modules
+
 ## 1.0.1
 
 ### Fixed
