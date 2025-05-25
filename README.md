@@ -14,206 +14,305 @@ and the Flutter guide for
 # EggyByte Core
 
 [![pub package](https://img.shields.io/pub/v/eggybyte_core.svg)](https://pub.dev/packages/eggybyte_core)
-[![style: flutter lints](https://img.shields.io/badge/style-flutter__lints-blue)](https://pub.dev/packages/flutter_lints)
+[![style: very good analysis](https://img.shields.io/badge/style-very_good_analysis-B22C89.svg)](https://pub.dev/packages/very_good_analysis)
+![Platform](https://img.shields.io/badge/platform-android%20%7C%20ios%20%7C%20web%20%7C%20windows%20%7C%20macos%20%7C%20linux-blue)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A foundational Flutter package for EggyByte Technology, providing a collection of common utilities and core functionalities including logging, networking, screen utilities, storage, and formatting.
+A foundational Flutter package providing essential utilities and core functionalities for EggyByte Technology applications.
 
-## ✨ Features
+## ✨ Key Features
 
-- **🔍 Centralized Logging**: Rich, configurable logging with color support and platform-specific native logging
-- **🌐 Network Utilities**: HTTP client with Bearer token authentication and WebSocket support  
-- **📱 Screen Utilities**: Device and context dimension helpers
-- **💾 Storage Utilities**: Persistent file storage operations
-- **📅 Format Utilities**: Time, date, and number formatting with Chinese localization
-- **⚙️ Platform Configuration**: Target platform detection and configuration
+- **🚀 One-Line Initialization**: Automatic platform detection and optimal configuration
+- **🎯 Smart Logging**: Platform-aware logging with automatic ANSI escape sequence handling
+- **🌐 Universal Platform Support**: Android, iOS, Web, Windows, macOS, Linux
+- **📱 Screen Utilities**: Device and context-aware screen dimension utilities
+- **💾 Storage Management**: Persistent file storage with error handling
+- **📊 Data Formatting**: Time, date, and number formatting with Chinese locale support
+- **🌐 Network Operations**: HTTP client with Bearer token authentication
+- **🧪 Comprehensive Testing**: 44+ unit tests ensuring reliability
 
-## 📦 Installation
+## 🚀 Quick Start
 
-Add this to your package's `pubspec.yaml` file:
+### Installation
+
+Add `eggybyte_core` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  eggybyte_core: ^1.0.1
+  eggybyte_core: ^1.0.3
 ```
 
 Then run:
-
 ```bash
 flutter pub get
 ```
 
-## 🚀 Quick Start
+### Basic Usage - New Simplified API
 
+**Step 1: One-line initialization (New in v1.0.3)**
 ```dart
 import 'package:eggybyte_core/eggybyte_core.dart';
 
 void main() {
-  // Configure the core library
-  EggyByteCore.setTargetPlatform(TargetPlatform.android);
-  EggyByteCore.configureLogging(
-    enableColors: true,
-    enableBold: true,
-  );
-
-  // Start using the utilities
-  LoggingUtils.info('Application *started* successfully!');
+  // 🎉 That's it! Automatic platform detection and optimal configuration
+  EggyByteCore.initialize();
+  
+  runApp(MyApp());
 }
 ```
 
-## 📖 Documentation
-
-### Configuration
-
-#### Platform Setup
+**Step 2: Start using utilities immediately**
 ```dart
-// Set the target platform
-EggyByteCore.setTargetPlatform(TargetPlatform.android);
+void exampleUsage() {
+  // Logging - automatically configured for your platform
+  LoggingUtils.info('Application started successfully');
+  LoggingUtils.warning('This is a warning message');
+  LoggingUtils.error('Error occurred', stackTrace: StackTrace.current);
+  
+  // Native platform logging
+  final platformPrefix = EggyByteCore.getPlatformPrefix(); // e.g., "ANDROID NATIVE"
+  LoggingUtils.nativeInfo('Native operation completed', platformPrefix: platformPrefix);
+  
+  // Date and time formatting
+  final now = DateTime.now();
+  final chineseTime = FormatUtils.formatTimeChineseSeparated(now); // "14时30分55秒"
+  final chineseDate = FormatUtils.formatDateChineseSeparated(now); // "2023年10月27日"
+  
+  // Number formatting with Chinese units
+  final formattedNumber = FormatUtils.formatNumberWithUnits(12345); // "1.23万"
+  
+  LoggingUtils.info('Formatted time: *$chineseTime*, number: *$formattedNumber*');
+}
+```
 
-// Configure logging appearance
-EggyByteCore.configureLogging(
-  enableColors: true,  // Enable ANSI colors (disable for some IDEs)
-  enableBold: true,    // Enable bold text formatting
+### Advanced Configuration (Optional)
+
+```dart
+// Custom logging configuration
+EggyByteCore.initialize(
+  enableColors: false,  // Disable colors manually
+  enableBold: true,     // Keep bold formatting
 );
+
+// Or reconfigure after initialization
+EggyByteCore.configureLogging(enableColors: true, enableBold: false);
 ```
 
-### Logging Utilities
+### Platform Detection
 
-#### Basic Logging
+The library automatically detects your platform and applies optimal settings:
+
 ```dart
-// Standard log levels
-LoggingUtils.info('This is an *info* message');
-LoggingUtils.warning('This is a *warning* message');
-LoggingUtils.error('This is an *error* message');
-LoggingUtils.debug('This is a *debug* message');
+void showPlatformInfo() {
+  EggyByteCore.initialize();
+  
+  final platform = EggyByteCore.getTargetPlatform(); // Auto-detected: android, ios, web, etc.
+  final prefix = EggyByteCore.getPlatformPrefix();   // e.g., "IOS NATIVE"
+  
+  LoggingUtils.info('Running on: *${platform?.name.toUpperCase()}*');
+}
 ```
 
-#### Native Platform Logging
-```dart
-// Log with platform prefix
-LoggingUtils.nativeInfo('SDK initialized', platformPrefix: 'ANDROID NATIVE');
-LoggingUtils.nativeError('Connection failed', platformPrefix: 'IOS NATIVE');
+## 🛠️ Comprehensive Utilities
 
-// Or use the configured platform automatically
-final prefix = EggyByteCore.getPlatformPrefix(); // Returns "ANDROID NATIVE"
-LoggingUtils.nativeDebug('Native method called', platformPrefix: prefix);
+### 📝 LoggingUtils - Smart Logging System
+
+```dart
+// Basic logging
+LoggingUtils.info('Info message with *bold* keywords');
+LoggingUtils.warning('Warning message');
+LoggingUtils.error('Error message', stackTrace: StackTrace.current);
+LoggingUtils.debug('Debug information');
+
+// Native platform logging
+LoggingUtils.nativeInfo('iOS operation', platformPrefix: 'IOS NATIVE');
+LoggingUtils.nativeError('Android error', platformPrefix: 'ANDROID NATIVE');
+
+// Configure formatting (colors automatically disabled on iOS debug)
+LoggingUtils.configureFormatting(enableColors: true, enableBold: true);
 ```
 
-### Network Utilities
+### 🌐 NetworkUtils - HTTP Client
 
-#### HTTP Operations
 ```dart
-// Set Bearer token for authentication
-NetworkUtils.setBearerToken('your-auth-token');
+// Bearer token management
+NetworkUtils.setBearerToken('your_api_token');
 
-// GET request
-final response = await NetworkUtils.get(
-  'https://api.example.com/data',
-  queryParameters: {'page': '1', 'limit': '10'},
-);
+// HTTP requests
+try {
+  final response = await NetworkUtils.get(
+    'https://api.example.com/data',
+    headers: {'Custom-Header': 'value'},
+    queryParameters: {'page': '1', 'limit': '10'},
+  );
+  LoggingUtils.info('Response: ${response.statusCode}');
+} catch (e) {
+  LoggingUtils.error('Request failed: $e');
+}
 
 // POST request
 final postResponse = await NetworkUtils.post(
-  'https://api.example.com/users',
-  body: {'name': 'John', 'email': 'john@example.com'},
+  'https://api.example.com/create',
+  body: {'name': 'EggyByte', 'type': 'technology'},
 );
 
-// Clear token when needed
 NetworkUtils.clearBearerToken();
 ```
 
-### Screen Utilities
+### 📱 ScreenUtils - Screen Dimensions
 
 ```dart
-// Get device screen dimensions
-final screenWidth = ScreenUtils.getDeviceScreenWidth();
-final screenHeight = ScreenUtils.getDeviceScreenHeight();
-
-// Get context dimensions (in a Widget)
 class MyWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // Device screen dimensions
+    final deviceWidth = ScreenUtils.getDeviceScreenWidth();
+    final deviceHeight = ScreenUtils.getDeviceScreenHeight();
+    
+    // Context-specific dimensions
     final contextWidth = ScreenUtils.getContextWidth(context);
     final contextHeight = ScreenUtils.getContextHeight(context);
     
-    return Container(
-      width: contextWidth * 0.8,
-      height: contextHeight * 0.6,
-      child: Text('Responsive Widget'),
-    );
+    LoggingUtils.debug('Device: ${deviceWidth}x$deviceHeight, Context: ${contextWidth}x$contextHeight');
+    
+    return Container(/* ... */);
   }
 }
 ```
 
-### Storage Utilities
+### 💾 StorageUtils - File Management
 
 ```dart
-// Save data to file
-await StorageUtils.saveToFile('user_data.json', jsonEncode(userData));
-
-// Read data from file
-final content = await StorageUtils.readFromFile('user_data.json');
-if (content != null) {
-  final userData = jsonDecode(content);
+Future<void> storageExample() async {
+  try {
+    // Save data
+    await StorageUtils.saveToFile('user_data.json', '{"name": "EggyByte"}');
+    LoggingUtils.info('Data saved successfully');
+    
+    // Read data
+    final content = await StorageUtils.readFromFile('user_data.json');
+    if (content != null) {
+      LoggingUtils.info('Read data: *$content*');
+    }
+    
+    // Delete file
+    final deleted = await StorageUtils.deleteFile('user_data.json');
+    LoggingUtils.info('File deleted: *$deleted*');
+  } catch (e) {
+    LoggingUtils.error('Storage operation failed: $e');
+  }
 }
-
-// Delete file
-final deleted = await StorageUtils.deleteFile('temp_data.txt');
 ```
 
-### Format Utilities
+### 📊 FormatUtils - Data Formatting
 
-#### Time Formatting
 ```dart
-final now = DateTime.now();
-
-// Symbol-separated time: "14:30:55"
-final timeSymbol = FormatUtils.formatTimeSymbolSeparated(now);
-
-// Chinese time format: "14时30分55秒"
-final timeChinese = FormatUtils.formatTimeChineseSeparated(now);
+void formattingExamples() {
+  final now = DateTime.now();
+  
+  // Time formatting
+  final timeColon = FormatUtils.formatTimeSymbolSeparated(now); // "14:30:55"
+  final timeDash = FormatUtils.formatTimeSymbolSeparated(now, separator: '-'); // "14-30-55"
+  final timeChinese = FormatUtils.formatTimeChineseSeparated(now); // "14时30分55秒"
+  
+  // Date formatting
+  final dateDefault = FormatUtils.formatDateSymbolSeparated(now); // "2023-10-27"
+  final dateSlash = FormatUtils.formatDateSymbolSeparated(now, separator: '/'); // "2023/10/27"
+  final dateChinese = FormatUtils.formatDateChineseSeparated(now); // "2023年10月27日"
+  
+  // Number formatting
+  final decimal = FormatUtils.formatNumberDecimalPlaces(123.456, 2); // "123.46"
+  final withUnits = FormatUtils.formatNumberWithUnits(12345); // "1.23万"
+  final bigNumber = FormatUtils.formatNumberWithUnits(123456789); // "1.23亿"
+  
+  LoggingUtils.info('Formatted: time=*$timeChinese*, date=*$dateChinese*, number=*$withUnits*');
+}
 ```
 
-#### Date Formatting
+## 🔧 Migration from v1.0.2
+
+If you're upgrading from v1.0.2, here's how to migrate:
+
+**Old API (still supported but deprecated):**
 ```dart
-final today = DateTime.now();
-
-// Symbol-separated date: "2023-10-27"
-final dateSymbol = FormatUtils.formatDateSymbolSeparated(today);
-
-// Chinese date format: "2023年10月27日"
-final dateChinese = FormatUtils.formatDateChineseSeparated(today);
+// ❌ Manual platform configuration (deprecated)
+EggyByteCore.setTargetPlatform(TargetPlatform.android);
+EggyByteCore.configureLogging(enableColors: false, enableBold: false);
 ```
 
-#### Number Formatting
+**New API (recommended):**
 ```dart
-// Decimal places: "123.46"
-final formatted = FormatUtils.formatNumberDecimalPlaces(123.456, 2);
+// ✅ Automatic platform detection and configuration
+EggyByteCore.initialize(); // Automatically handles iOS ANSI escape issues!
 
-// Chinese units: "1.2万", "1.5亿"
-final withUnits1 = FormatUtils.formatNumberWithUnits(12000); // "1.20万"
-final withUnits2 = FormatUtils.formatNumberWithUnits(150000000); // "1.50亿"
+// Or with custom settings
+EggyByteCore.initialize(enableColors: false, enableBold: true);
 ```
+
+## 🧪 Testing
+
+The library includes comprehensive tests covering all functionality:
+
+```bash
+flutter test
+```
+
+**Test Coverage:**
+- ✅ 44+ unit tests
+- ✅ Automatic platform detection
+- ✅ Logging system with native platform support
+- ✅ All utility modules (Format, Network, Storage, Screen)
+- ✅ Integration tests
+- ✅ Backward compatibility
 
 ## 🎯 Platform Support
 
-- ✅ Android
-- ✅ iOS  
-- ✅ Web
-- ✅ Windows
-- ✅ macOS
-- ✅ Linux
+| Platform | Status | Auto-Detection | ANSI Colors |
+|----------|--------|----------------|-------------|
+| **Android** | ✅ Full Support | ✅ | ✅ |
+| **iOS** | ✅ Full Support | ✅ | 🔄 Auto-disabled in debug |
+| **Web** | ✅ Full Support | ✅ | ✅ |
+| **Windows** | ✅ Full Support | ✅ | ✅ |
+| **macOS** | ✅ Full Support | ✅ | ✅ |
+| **Linux** | ✅ Full Support | ✅ | ✅ |
+
+## 📖 API Documentation
+
+### EggyByteCore
+
+| Method | Description |
+|--------|-------------|
+| `initialize({bool? enableColors, bool? enableBold})` | **Auto-detects platform and configures optimal settings** |
+| `isInitialized` | Checks if the library has been initialized |
+| `getTargetPlatform()` | Returns the auto-detected platform |
+| `getPlatformPrefix()` | Returns platform-specific prefix for native logging |
+| `configureLogging({bool enableColors, bool enableBold})` | Manually reconfigure logging |
+| `reset()` | Reset initialization state (mainly for testing) |
+
+### LoggingUtils
+
+| Method | Description |
+|--------|-------------|
+| `info(String message)` | Log info message |
+| `warning(String message)` | Log warning message |
+| `error(String message, {StackTrace? stackTrace})` | Log error with optional stack trace |
+| `debug(String message)` | Log debug message |
+| `nativeInfo/Warning/Error/Debug(String message, {String? platformPrefix})` | Platform-specific native logging |
+
+### FormatUtils
+
+| Method | Description |
+|--------|-------------|
+| `formatTimeSymbolSeparated(DateTime time, {String separator = ':'})` | Format time with custom separator |
+| `formatTimeChineseSeparated(DateTime time)` | Format time in Chinese style |
+| `formatDateSymbolSeparated(DateTime date, {String separator = '-'})` | Format date with custom separator |
+| `formatDateChineseSeparated(DateTime date)` | Format date in Chinese style |
+| `formatNumberDecimalPlaces(double number, int decimalPlaces)` | Format number with specific decimal places |
+| `formatNumberWithUnits(double number, {int decimalPlaces = 2})` | Format number with Chinese units (万, 亿) |
 
 ## 🤝 Contributing
 
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-### Development Guidelines
-
-1. **Language**: All code, comments, and logs must be in English
-2. **Architecture**: All utilities must be implemented as static methods
-3. **Logging**: All methods must use the centralized `LoggingUtils`
-4. **Testing**: Write comprehensive tests for new features
 
 ## 📄 License
 
@@ -221,14 +320,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🏢 About EggyByte Technology
 
-EggyByte Technology is committed to creating high-quality, reusable Flutter components and utilities. This core library serves as the foundation for our Flutter applications and packages.
-
-## 📞 Support
-
-- 📧 Email: support@eggybyte.tech
-- 🐛 Issues: [GitHub Issues](https://github.com/eggybyte-technology/flutter-eggybyte-core/issues)
-- 📖 Documentation: [API Reference](https://pub.dev/documentation/eggybyte_core/latest/)
+EggyByte Core is maintained by [EggyByte Technology](https://eggybyte.com). We build innovative software solutions with cutting-edge technology.
 
 ---
 
-Made with ❤️ by [EggyByte Technology](https://github.com/eggybyte-technology)
+**Happy coding! 🥳**

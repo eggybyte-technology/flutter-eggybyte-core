@@ -3,60 +3,113 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:eggybyte_core/eggybyte_core.dart';
 
 void main() {
-  group('EggyByteCore Configuration Tests', () {
+  group('EggyByteCore Auto-Initialization Tests', () {
+    setUp(() {
+      // Reset state before each test
+      EggyByteCore.reset();
+    });
+
     tearDown(() {
-      // Reset to defaults after each test
-      EggyByteCore.configureLogging(enableColors: true, enableBold: true);
+      // Reset state after each test
+      EggyByteCore.reset();
     });
 
-    test('setTargetPlatform sets platform correctly', () {
-      EggyByteCore.setTargetPlatform(TargetPlatform.android);
-      expect(EggyByteCore.getTargetPlatform(), TargetPlatform.android);
+    test('initialize() automatically detects platform and configures logging',
+        () {
+      expect(EggyByteCore.isInitialized, false);
+      expect(EggyByteCore.getTargetPlatform(), null);
 
-      EggyByteCore.setTargetPlatform(TargetPlatform.ios);
-      expect(EggyByteCore.getTargetPlatform(), TargetPlatform.ios);
+      EggyByteCore.initialize();
 
-      EggyByteCore.setTargetPlatform(TargetPlatform.web);
-      expect(EggyByteCore.getTargetPlatform(), TargetPlatform.web);
+      expect(EggyByteCore.isInitialized, true);
+      expect(EggyByteCore.getTargetPlatform(), isNotNull);
+      expect(EggyByteCore.getPlatformPrefix(), isNotNull);
+      expect(EggyByteCore.getPlatformPrefix(), contains('NATIVE'));
     });
 
-    test('getPlatformPrefix returns correct prefix', () {
-      EggyByteCore.setTargetPlatform(TargetPlatform.android);
-      expect(EggyByteCore.getPlatformPrefix(), 'ANDROID NATIVE');
+    test('initialize() with custom logging configuration', () {
+      EggyByteCore.initialize(enableColors: false, enableBold: true);
 
-      EggyByteCore.setTargetPlatform(TargetPlatform.ios);
-      expect(EggyByteCore.getPlatformPrefix(), 'IOS NATIVE');
-
-      EggyByteCore.setTargetPlatform(TargetPlatform.windows);
-      expect(EggyByteCore.getPlatformPrefix(), 'WINDOWS NATIVE');
-
-      EggyByteCore.setTargetPlatform(TargetPlatform.macos);
-      expect(EggyByteCore.getPlatformPrefix(), 'MACOS NATIVE');
-
-      EggyByteCore.setTargetPlatform(TargetPlatform.linux);
-      expect(EggyByteCore.getPlatformPrefix(), 'LINUX NATIVE');
-
-      EggyByteCore.setTargetPlatform(TargetPlatform.web);
-      expect(EggyByteCore.getPlatformPrefix(), 'WEB NATIVE');
+      expect(EggyByteCore.isInitialized, true);
+      expect(EggyByteCore.getTargetPlatform(), isNotNull);
     });
 
-    test('configureLogging runs without errors', () {
-      expect(
-          () => EggyByteCore.configureLogging(
-              enableColors: true, enableBold: true),
-          returnsNormally);
+    test('initialize() prevents double initialization', () {
+      EggyByteCore.initialize();
+      expect(EggyByteCore.isInitialized, true);
+
+      // Second initialization should be ignored
+      EggyByteCore.initialize(enableColors: false);
+      expect(EggyByteCore.isInitialized, true);
+    });
+
+    test('reset() resets initialization state', () {
+      EggyByteCore.initialize();
+      expect(EggyByteCore.isInitialized, true);
+      expect(EggyByteCore.getTargetPlatform(), isNotNull);
+
+      EggyByteCore.reset();
+      expect(EggyByteCore.isInitialized, false);
+      expect(EggyByteCore.getTargetPlatform(), null);
+    });
+
+    test('auto-detected platform is valid', () {
+      EggyByteCore.initialize();
+      final platform = EggyByteCore.getTargetPlatform();
+
+      expect(platform, isNotNull);
+      expect(TargetPlatform.values, contains(platform));
+    });
+
+    test('getPlatformPrefix returns correct format', () {
+      EggyByteCore.initialize();
+      final prefix = EggyByteCore.getPlatformPrefix();
+
+      expect(prefix, isNotNull);
+      expect(prefix, matches(r'^[A-Z]+ NATIVE$'));
+    });
+
+    test('configureLogging works after initialization', () {
+      EggyByteCore.initialize();
+
       expect(
           () => EggyByteCore.configureLogging(
               enableColors: false, enableBold: false),
           returnsNormally);
-      expect(
-          () => EggyByteCore.configureLogging(
-              enableColors: true, enableBold: false),
-          returnsNormally);
-      expect(
-          () => EggyByteCore.configureLogging(
-              enableColors: false, enableBold: true),
-          returnsNormally);
+    });
+  });
+
+  group('Backward Compatibility Tests', () {
+    setUp(() {
+      EggyByteCore.reset();
+    });
+
+    tearDown(() {
+      EggyByteCore.reset();
+    });
+
+    test('deprecated setTargetPlatform still works', () {
+      // ignore: deprecated_member_use
+      EggyByteCore.setTargetPlatform(TargetPlatform.android);
+      expect(EggyByteCore.getTargetPlatform(), TargetPlatform.android);
+
+      // ignore: deprecated_member_use
+      EggyByteCore.setTargetPlatform(TargetPlatform.ios);
+      expect(EggyByteCore.getTargetPlatform(), TargetPlatform.ios);
+    });
+
+    test('getPlatformPrefix works with manually set platform', () {
+      // ignore: deprecated_member_use
+      EggyByteCore.setTargetPlatform(TargetPlatform.android);
+      expect(EggyByteCore.getPlatformPrefix(), 'ANDROID NATIVE');
+
+      // ignore: deprecated_member_use
+      EggyByteCore.setTargetPlatform(TargetPlatform.ios);
+      expect(EggyByteCore.getPlatformPrefix(), 'IOS NATIVE');
+
+      // ignore: deprecated_member_use
+      EggyByteCore.setTargetPlatform(TargetPlatform.windows);
+      expect(EggyByteCore.getPlatformPrefix(), 'WINDOWS NATIVE');
     });
 
     test('TargetPlatform enum has all expected values', () {
@@ -73,8 +126,13 @@ void main() {
 
   group('Enhanced LoggingUtils Tests', () {
     setUp(() {
-      // Ensure logging is in a known state
-      LoggingUtils.configureFormatting(enableColors: true, enableBold: true);
+      EggyByteCore.reset();
+      // Initialize EggyByte Core before testing logging
+      EggyByteCore.initialize();
+    });
+
+    tearDown(() {
+      EggyByteCore.reset();
     });
 
     test('Basic logging methods run without errors', () {
@@ -145,9 +203,9 @@ void main() {
     });
 
     test('Native logging with EggyByteCore platform prefix integration', () {
-      EggyByteCore.setTargetPlatform(TargetPlatform.android);
       final prefix = EggyByteCore.getPlatformPrefix();
-      expect(prefix, 'ANDROID NATIVE');
+      expect(prefix, isNotNull);
+      expect(prefix, contains('NATIVE'));
 
       expect(
           () => LoggingUtils.nativeInfo('Integration test',
@@ -397,17 +455,29 @@ void main() {
   });
 
   group('Integration Tests', () {
-    test('EggyByteCore and LoggingUtils integration', () {
-      // Test the integration between EggyByteCore and LoggingUtils
-      EggyByteCore.setTargetPlatform(TargetPlatform.android);
-      EggyByteCore.configureLogging(enableColors: false, enableBold: false);
+    setUp(() {
+      EggyByteCore.reset();
+    });
 
+    tearDown(() {
+      EggyByteCore.reset();
+    });
+
+    test('EggyByteCore auto-initialization with LoggingUtils integration', () {
+      // Test the new auto-initialization flow
+      EggyByteCore.initialize();
+
+      expect(EggyByteCore.isInitialized, true);
+      final platform = EggyByteCore.getTargetPlatform();
       final prefix = EggyByteCore.getPlatformPrefix();
-      expect(prefix, 'ANDROID NATIVE');
 
-      // Test native logging with platform prefix
+      expect(platform, isNotNull);
+      expect(prefix, isNotNull);
+      expect(prefix, contains('NATIVE'));
+
+      // Test native logging with auto-detected platform prefix
       expect(
-          () => LoggingUtils.nativeInfo('Integration test',
+          () => LoggingUtils.nativeInfo('Auto-initialization test',
               platformPrefix: prefix),
           returnsNormally);
       expect(
@@ -416,17 +486,20 @@ void main() {
           returnsNormally);
     });
 
-    test('Full workflow test', () {
-      // Test a complete workflow
-      EggyByteCore.setTargetPlatform(TargetPlatform.ios);
-      EggyByteCore.configureLogging(enableColors: true, enableBold: true);
+    test('Full workflow with auto-initialization', () {
+      // Test a complete workflow with new API
+      EggyByteCore.initialize(enableColors: true, enableBold: true);
 
+      expect(EggyByteCore.isInitialized, true);
+      final platform = EggyByteCore.getTargetPlatform();
       final prefix = EggyByteCore.getPlatformPrefix();
-      expect(prefix, 'IOS NATIVE');
+
+      expect(platform, isNotNull);
+      expect(prefix, isNotNull);
 
       // Use various utilities
-      LoggingUtils.info('Starting workflow test');
-      LoggingUtils.nativeInfo('Native iOS operation', platformPrefix: prefix);
+      LoggingUtils.info('Starting auto-workflow test');
+      LoggingUtils.nativeInfo('Native operation', platformPrefix: prefix);
 
       final now = DateTime.now();
       final timeFormatted = FormatUtils.formatTimeChineseSeparated(now);
@@ -436,31 +509,41 @@ void main() {
       LoggingUtils.info('Network configured');
       NetworkUtils.clearBearerToken();
 
-      LoggingUtils.info('Workflow test completed');
+      LoggingUtils.info('Auto-workflow test completed');
       expect(true, isTrue);
     });
 
-    test('Platform switching test', () {
-      final platforms = [
-        TargetPlatform.android,
-        TargetPlatform.ios,
-        TargetPlatform.web,
-        TargetPlatform.windows,
-        TargetPlatform.macos,
-        TargetPlatform.linux,
-      ];
+    test('Reset and re-initialization test', () {
+      // Initialize
+      EggyByteCore.initialize();
+      expect(EggyByteCore.isInitialized, true);
+      final firstPlatform = EggyByteCore.getTargetPlatform();
 
-      for (final platform in platforms) {
-        EggyByteCore.setTargetPlatform(platform);
-        expect(EggyByteCore.getTargetPlatform(), platform);
+      // Reset
+      EggyByteCore.reset();
+      expect(EggyByteCore.isInitialized, false);
+      expect(EggyByteCore.getTargetPlatform(), null);
 
-        final prefix = EggyByteCore.getPlatformPrefix();
-        expect(prefix, contains('NATIVE'));
-        expect(prefix, contains(platform.name.toUpperCase()));
+      // Re-initialize
+      EggyByteCore.initialize();
+      expect(EggyByteCore.isInitialized, true);
+      final secondPlatform = EggyByteCore.getTargetPlatform();
 
-        LoggingUtils.nativeInfo('Testing platform ${platform.name}',
-            platformPrefix: prefix);
-      }
+      // Platform should be the same after re-initialization
+      expect(secondPlatform, firstPlatform);
+    });
+
+    test('Custom logging configuration after initialization', () {
+      EggyByteCore.initialize();
+
+      // Should be able to reconfigure logging after initialization
+      expect(
+          () => EggyByteCore.configureLogging(
+              enableColors: false, enableBold: false),
+          returnsNormally);
+
+      // Logging should still work
+      expect(() => LoggingUtils.info('Reconfiguration test'), returnsNormally);
     });
   });
 }

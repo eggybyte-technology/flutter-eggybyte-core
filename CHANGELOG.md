@@ -1,3 +1,42 @@
+## 1.0.3
+
+### Added
+- **Automatic Platform Detection & Unified Initialization**:
+  - Added automatic platform detection using `dart:io` Platform and Flutter's `defaultTargetPlatform`
+  - Introduced unified `EggyByteCore.initialize()` method that automatically detects platform and configures optimal settings
+  - Automatic color/bold configuration based on platform and debug environment (fixes iOS ANSI escape sequences automatically)
+  - Added `EggyByteCore.isInitialized` getter to check initialization state
+  - Added `EggyByteCore.reset()` method for testing and re-initialization scenarios
+- **Intelligent Environment Detection**:
+  - Automatically disables ANSI colors and bold formatting on iOS debug builds to prevent escape sequence display issues
+  - Smart fallback system: `dart:io` Platform → Flutter `defaultTargetPlatform` → Web fallback
+  - Supports all platforms: Android, iOS, Web, Windows, macOS, Linux
+- **Improved Developer Experience**:
+  - One-line initialization: `EggyByteCore.initialize()` - no manual platform configuration needed
+  - Optional custom configuration: `EggyByteCore.initialize(enableColors: false, enableBold: true)`
+  - Prevents double initialization with warning messages
+  - Backward compatibility maintained with deprecation warnings for old API
+
+### Changed
+- **Breaking Changes (with backward compatibility)**:
+  - `EggyByteCore.setTargetPlatform()` is now deprecated (marked with `@Deprecated`)
+  - Recommended migration: Replace manual platform setting with `EggyByteCore.initialize()`
+- **Enhanced API Design**:
+  - Platform detection is now fully automatic and more reliable
+  - Logging configuration automatically optimized for detected platform
+  - Simplified initialization flow reduces integration complexity
+
+### Fixed
+- Resolved ANSI escape sequence display issues on iOS debug builds (now automatically detected and disabled)
+- Improved platform detection reliability across different Flutter environments
+- Enhanced error handling for unsupported platform detection scenarios
+
+### Technical Improvements
+- Added comprehensive test coverage for automatic initialization (44 passing tests)
+- Enhanced platform detection logic with multiple fallback mechanisms
+- Improved code organization with clear separation between public and private APIs
+- Added extensive documentation for new initialization patterns
+
 ## 1.0.2
 
 ### Added

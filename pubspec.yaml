@@ -1,14 +1,15 @@
 name: eggybyte_core
-description: A foundational Flutter package for EggyByte Technology, providing a collection of common utilities and core functionalities including logging, networking, screen utilities, storage, and formatting.
-version: 1.0.2
+description: "A foundational Flutter package providing essential utilities and core functionalities for EggyByte Technology applications with automatic platform detection and smart logging."
+version: 1.0.3
 homepage: https://github.com/eggybyte-technology/flutter-eggybyte-core
 repository: https://github.com/eggybyte-technology/flutter-eggybyte-core
 issue_tracker: https://github.com/eggybyte-technology/flutter-eggybyte-core/issues
+documentation: https://pub.dev/documentation/eggybyte_core/latest/
 
 publish_to: none
 
 environment:
-  sdk: '>=2.19.0 <4.0.0'
+  sdk: '>=3.0.0 <4.0.0'
   flutter: ">=3.0.0"
 
 dependencies:
@@ -31,12 +32,13 @@ flutter:
 
 # Package information
 topics:
-  - utility
+  - utilities
   - logging
   - networking
-  - storage
   - formatting
-  - flutter
+  - storage
+  - platform-detection
+  - core-library
 
 funding:
   - https://github.com/sponsors/eggybyte-technology
