@@ -15,27 +15,44 @@
   - One-line initialization: `EggyByteCore.initialize()` - no manual platform configuration needed
   - Optional custom configuration: `EggyByteCore.initialize(enableColors: false, enableBold: true)`
   - Prevents double initialization with warning messages
-  - Backward compatibility maintained with deprecation warnings for old API
+  - LoggingUtils now automatically uses platform prefix from EggyByteCore when no explicit prefix is provided
+- **Enhanced Native Logging Integration**:
+  - `LoggingUtils.logNative()` and convenience methods (`nativeInfo()`, `nativeWarning()`, etc.) now automatically use EggyByteCore's detected platform prefix when no custom prefix is provided
+  - Added platform prefix provider system to avoid circular dependencies
+  - Seamless integration between EggyByteCore and LoggingUtils for native platform logging
 
 ### Changed
 - **Breaking Changes (with backward compatibility)**:
-  - `EggyByteCore.setTargetPlatform()` is now deprecated (marked with `@Deprecated`)
-  - Recommended migration: Replace manual platform setting with `EggyByteCore.initialize()`
+  - **REMOVED**: Custom `TargetPlatform` enum - now uses Flutter's native `TargetPlatform` from `package:flutter/foundation.dart`
+  - **REMOVED**: `EggyByteCore.setTargetPlatform()` deprecated method (was marked deprecated in previous version)
+  - Platform detection now returns Flutter's native `TargetPlatform` values (`TargetPlatform.iOS` instead of custom `TargetPlatform.ios`, etc.)
+  - Platform prefix format updated to match Flutter's native naming: "IOS NATIVE", "MACOS NATIVE" instead of "ios NATIVE", "macos NATIVE"
 - **Enhanced API Design**:
-  - Platform detection is now fully automatic and more reliable
+  - Platform detection is now fully automatic and more reliable using Flutter's standard TargetPlatform
   - Logging configuration automatically optimized for detected platform
   - Simplified initialization flow reduces integration complexity
+  - Better alignment with Flutter's native platform detection system
+
+### Removed
+- **Deprecated API Cleanup**:
+  - Removed deprecated `EggyByteCore.setTargetPlatform()` method
+  - Removed custom `TargetPlatform` enum in favor of Flutter's native implementation
+  - Cleaned up all backward compatibility code for deprecated platform handling
+  - Removed outdated tests for deprecated functionality
 
 ### Fixed
 - Resolved ANSI escape sequence display issues on iOS debug builds (now automatically detected and disabled)
 - Improved platform detection reliability across different Flutter environments
 - Enhanced error handling for unsupported platform detection scenarios
+- Fixed platform naming consistency with Flutter's standard TargetPlatform enum
 
 ### Technical Improvements
-- Added comprehensive test coverage for automatic initialization (44 passing tests)
-- Enhanced platform detection logic with multiple fallback mechanisms
-- Improved code organization with clear separation between public and private APIs
-- Added extensive documentation for new initialization patterns
+- Updated comprehensive test coverage for new platform integration (41 passing tests)
+- Enhanced platform detection logic using Flutter's native TargetPlatform system
+- Improved code organization with removal of deprecated APIs
+- Simplified codebase by eliminating custom platform enumeration
+- Added platform prefix provider pattern for LoggingUtils integration
+- Enhanced documentation for new platform detection patterns
 
 ## 1.0.2
 

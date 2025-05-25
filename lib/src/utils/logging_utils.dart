@@ -29,6 +29,15 @@ class LoggingUtils {
   static bool _enableColors = true;
   static bool _enableBold = true;
 
+  // Platform prefix provider function
+  static String? Function()? _platformPrefixProvider;
+
+  /// Sets the platform prefix provider function
+  /// This should be called by EggyByteCore during initialization
+  static void setPlatformPrefixProvider(String? Function()? provider) {
+    _platformPrefixProvider = provider;
+  }
+
   /// Configures the formatting options for logging
   ///
   /// [enableColors]: Whether to enable ANSI color codes
@@ -140,6 +149,7 @@ class LoggingUtils {
   ///
   /// [message]: The log message
   /// [platformPrefix]: Platform identifier (e.g., "ANDROID NATIVE", "IOS NATIVE")
+  ///                   If null, attempts to get platform prefix from EggyByteCore
   /// [type]: The log type (defaults to info)
   static void logNative(
     String message, {
@@ -147,8 +157,20 @@ class LoggingUtils {
     LogType type = LogType.info,
     StackTrace? stackTrace,
   }) {
-    final String prefixedMessage = platformPrefix != null
-        ? '[$platformPrefix] $message'
+    String? effectivePlatformPrefix = platformPrefix;
+
+    // If no platform prefix provided, try to get it from the provider
+    if (effectivePlatformPrefix == null && _platformPrefixProvider != null) {
+      try {
+        effectivePlatformPrefix = _platformPrefixProvider!();
+      } catch (e) {
+        // Fallback to generic NATIVE if provider fails
+        effectivePlatformPrefix = 'NATIVE';
+      }
+    }
+
+    final String prefixedMessage = effectivePlatformPrefix != null
+        ? '[$effectivePlatformPrefix] $message'
         : '[NATIVE] $message';
 
     log(prefixedMessage, type: type, stackTrace: stackTrace);

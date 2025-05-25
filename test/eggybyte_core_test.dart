@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/foundation.dart' show TargetPlatform;
 
 import 'package:eggybyte_core/eggybyte_core.dart';
 
@@ -76,51 +77,6 @@ void main() {
           () => EggyByteCore.configureLogging(
               enableColors: false, enableBold: false),
           returnsNormally);
-    });
-  });
-
-  group('Backward Compatibility Tests', () {
-    setUp(() {
-      EggyByteCore.reset();
-    });
-
-    tearDown(() {
-      EggyByteCore.reset();
-    });
-
-    test('deprecated setTargetPlatform still works', () {
-      // ignore: deprecated_member_use
-      EggyByteCore.setTargetPlatform(TargetPlatform.android);
-      expect(EggyByteCore.getTargetPlatform(), TargetPlatform.android);
-
-      // ignore: deprecated_member_use
-      EggyByteCore.setTargetPlatform(TargetPlatform.ios);
-      expect(EggyByteCore.getTargetPlatform(), TargetPlatform.ios);
-    });
-
-    test('getPlatformPrefix works with manually set platform', () {
-      // ignore: deprecated_member_use
-      EggyByteCore.setTargetPlatform(TargetPlatform.android);
-      expect(EggyByteCore.getPlatformPrefix(), 'ANDROID NATIVE');
-
-      // ignore: deprecated_member_use
-      EggyByteCore.setTargetPlatform(TargetPlatform.ios);
-      expect(EggyByteCore.getPlatformPrefix(), 'IOS NATIVE');
-
-      // ignore: deprecated_member_use
-      EggyByteCore.setTargetPlatform(TargetPlatform.windows);
-      expect(EggyByteCore.getPlatformPrefix(), 'WINDOWS NATIVE');
-    });
-
-    test('TargetPlatform enum has all expected values', () {
-      final platforms = TargetPlatform.values;
-      expect(platforms, contains(TargetPlatform.android));
-      expect(platforms, contains(TargetPlatform.ios));
-      expect(platforms, contains(TargetPlatform.web));
-      expect(platforms, contains(TargetPlatform.windows));
-      expect(platforms, contains(TargetPlatform.macos));
-      expect(platforms, contains(TargetPlatform.linux));
-      expect(platforms.length, 6);
     });
   });
 
@@ -202,14 +158,15 @@ void main() {
           returnsNormally);
     });
 
-    test('Native logging with EggyByteCore platform prefix integration', () {
+    test('Native logging uses EggyByteCore platform prefix automatically', () {
+      // Test that logNative without platformPrefix uses EggyByteCore's prefix
       final prefix = EggyByteCore.getPlatformPrefix();
       expect(prefix, isNotNull);
       expect(prefix, contains('NATIVE'));
 
-      expect(
-          () => LoggingUtils.nativeInfo('Integration test',
-              platformPrefix: prefix),
+      expect(() => LoggingUtils.logNative('Auto platform prefix test'),
+          returnsNormally);
+      expect(() => LoggingUtils.nativeInfo('Auto integration test'),
           returnsNormally);
     });
 
@@ -476,14 +433,10 @@ void main() {
       expect(prefix, contains('NATIVE'));
 
       // Test native logging with auto-detected platform prefix
-      expect(
-          () => LoggingUtils.nativeInfo('Auto-initialization test',
-              platformPrefix: prefix),
+      expect(() => LoggingUtils.nativeInfo('Auto-initialization test'),
           returnsNormally);
       expect(
-          () => LoggingUtils.nativeDebug('Debug integration',
-              platformPrefix: prefix),
-          returnsNormally);
+          () => LoggingUtils.nativeDebug('Debug integration'), returnsNormally);
     });
 
     test('Full workflow with auto-initialization', () {
@@ -499,7 +452,7 @@ void main() {
 
       // Use various utilities
       LoggingUtils.info('Starting auto-workflow test');
-      LoggingUtils.nativeInfo('Native operation', platformPrefix: prefix);
+      LoggingUtils.nativeInfo('Native operation');
 
       final now = DateTime.now();
       final timeFormatted = FormatUtils.formatTimeChineseSeparated(now);

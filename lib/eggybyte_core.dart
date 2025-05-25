@@ -15,11 +15,7 @@ export 'src/utils/format_utils.dart';
 import 'src/utils/logging_utils.dart';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart'
-    show kIsWeb, kDebugMode, defaultTargetPlatform;
-import 'package:flutter/foundation.dart' as flutter show TargetPlatform;
-
-/// Supported target platforms
-enum TargetPlatform { android, ios, web, windows, macos, linux }
+    show kIsWeb, kDebugMode, defaultTargetPlatform, TargetPlatform;
 
 /// Main configuration class for EggyByte Core
 class EggyByteCore {
@@ -48,6 +44,9 @@ class EggyByteCore {
     _targetPlatform = _detectCurrentPlatform();
     LoggingUtils.info(
         'Platform auto-detected: *${_targetPlatform!.name.toUpperCase()}*');
+
+    // Set platform prefix provider for LoggingUtils
+    LoggingUtils.setPlatformPrefixProvider(() => getPlatformPrefix());
 
     // Auto-configure logging based on platform and environment
     final bool autoEnableColors = enableColors ?? _shouldEnableColors();
@@ -109,47 +108,31 @@ class EggyByteCore {
   static TargetPlatform _detectCurrentPlatform() {
     // Check if running on web first
     if (kIsWeb) {
-      return TargetPlatform.web;
+      // Web doesn't have a specific TargetPlatform, use defaultTargetPlatform
+      // or return a fallback based on user agent if needed
+      return defaultTargetPlatform;
     }
 
     // For native platforms, use dart:io Platform
     try {
       if (Platform.isAndroid) return TargetPlatform.android;
-      if (Platform.isIOS) return TargetPlatform.ios;
+      if (Platform.isIOS) return TargetPlatform.iOS;
       if (Platform.isWindows) return TargetPlatform.windows;
-      if (Platform.isMacOS) return TargetPlatform.macos;
+      if (Platform.isMacOS) return TargetPlatform.macOS;
       if (Platform.isLinux) return TargetPlatform.linux;
     } catch (e) {
-      // Fallback: try to determine from Flutter's defaultTargetPlatform
-      try {
-        switch (defaultTargetPlatform) {
-          case flutter.TargetPlatform.android:
-            return TargetPlatform.android;
-          case flutter.TargetPlatform.iOS:
-            return TargetPlatform.ios;
-          case flutter.TargetPlatform.windows:
-            return TargetPlatform.windows;
-          case flutter.TargetPlatform.macOS:
-            return TargetPlatform.macos;
-          case flutter.TargetPlatform.linux:
-            return TargetPlatform.linux;
-          default:
-            return TargetPlatform.web;
-        }
-      } catch (e) {
-        // Ultimate fallback
-        return TargetPlatform.web;
-      }
+      // Fallback: use Flutter's defaultTargetPlatform
+      return defaultTargetPlatform;
     }
 
     // Should not reach here, but just in case
-    return TargetPlatform.web;
+    return defaultTargetPlatform;
   }
 
   /// Determines if colors should be enabled based on platform and environment
   static bool _shouldEnableColors() {
     // Disable colors on iOS debug to avoid ANSI escape sequences in console
-    if (_targetPlatform == TargetPlatform.ios && kDebugMode) {
+    if (_targetPlatform == TargetPlatform.iOS && kDebugMode) {
       return false;
     }
     // Enable colors for all other cases
@@ -159,25 +142,10 @@ class EggyByteCore {
   /// Determines if bold text should be enabled based on platform and environment
   static bool _shouldEnableBold() {
     // Disable bold on iOS debug to avoid ANSI escape sequences in console
-    if (_targetPlatform == TargetPlatform.ios && kDebugMode) {
+    if (_targetPlatform == TargetPlatform.iOS && kDebugMode) {
       return false;
     }
     // Enable bold for all other cases
     return true;
-  }
-
-  // Deprecated methods (kept for backward compatibility)
-
-  /// Sets the current target platform for the application
-  ///
-  /// ⚠️ **Deprecated**: Use [initialize()] instead. Platform is now auto-detected.
-  @Deprecated(
-      'Use EggyByteCore.initialize() instead. Platform is now auto-detected.')
-  static void setTargetPlatform(TargetPlatform platform) {
-    _targetPlatform = platform;
-    LoggingUtils.warning(
-        'setTargetPlatform is deprecated. Use EggyByteCore.initialize() for automatic platform detection.');
-    LoggingUtils.info(
-        'Target platform manually set to: *${platform.name.toUpperCase()}*');
   }
 }
