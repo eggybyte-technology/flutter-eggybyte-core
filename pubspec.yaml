@@ -1,6 +1,6 @@
 name: eggybyte_core
 description: "A foundational Flutter package providing essential utilities and core functionalities for EggyByte Technology applications with automatic platform detection and smart logging."
-version: 1.0.3
+version: 1.0.4
 homepage: https://github.com/eggybyte-technology/flutter-eggybyte-core
 repository: https://github.com/eggybyte-technology/flutter-eggybyte-core
 issue_tracker: https://github.com/eggybyte-technology/flutter-eggybyte-core/issues

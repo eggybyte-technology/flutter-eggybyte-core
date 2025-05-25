@@ -113,7 +113,7 @@ class NetworkUtils {
   static void _logResponse(http.Response response) {
     if (response.body.isNotEmpty) {
       LoggingUtils.debug(
-        'Response Body (first 100 chars): ${response.body.substring(0, response.body.length > 100 ? 100 : response.body.length)}...',
+        'Response Body: ${response.body}',
       );
     }
     if (response.statusCode >= 400) {

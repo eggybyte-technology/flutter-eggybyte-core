@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 
 // ANSI escape codes for colors (won't work in all Dart consoles, e.g. Flutter debug console)
 // These are primarily for demonstration if running in a compatible terminal.
@@ -58,11 +59,17 @@ class LoggingUtils {
   /// - `message`: The log content. Important keywords can be emphasized if passed with markdown-like bold.
   ///
   /// For ERROR logs, additional details like stack traces should be handled.
+  /// For DEBUG logs, output is only generated when running in debug mode.
   static void log(
     String message, {
     LogType type = LogType.info,
     StackTrace? stackTrace,
   }) {
+    // Skip debug logs in non-debug mode
+    if (type == LogType.debug && !kDebugMode) {
+      return;
+    }
+
     final String currentTime = _timeFormatter.format(DateTime.now());
     String logTypeString = type.toString().split('.').last.toUpperCase();
 

@@ -1,3 +1,23 @@
+## 1.0.4
+
+### Changed
+- **Enhanced Network Response Logging**:
+  - `NetworkUtils`: Removed 100-character limit on response body logging
+  - HTTP response bodies are now logged in full for better debugging capabilities
+  - Improved debugging experience for API integrations with complete response visibility
+
+### Improved
+- **Optimized Debug Logging**:
+  - `LoggingUtils`: Debug logs (`LogType.debug`) are now only output when running in debug mode (`kDebugMode`)
+  - Reduces log noise in production builds while maintaining full debugging capability during development
+  - Performance improvement by avoiding unnecessary string processing for debug logs in release builds
+  - Added `kDebugMode` import from `package:flutter/foundation.dart`
+
+### Technical Improvements
+- Enhanced logging efficiency with conditional debug output
+- Improved network debugging with complete response visibility
+- Better alignment with Flutter's debug/release build optimization patterns
+
 ## 1.0.3
 
 ### Added

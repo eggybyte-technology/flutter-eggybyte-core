@@ -24,12 +24,14 @@ A foundational Flutter package providing essential utilities and core functional
 
 - **🚀 One-Line Initialization**: Automatic platform detection and optimal configuration
 - **🎯 Smart Logging**: Platform-aware logging with automatic ANSI escape sequence handling
+- **🔍 Optimized Debug Output**: Debug logs only appear in debug mode for better performance
+- **📋 Complete Network Debugging**: Full HTTP response logging for comprehensive debugging
 - **🌐 Universal Platform Support**: Android, iOS, Web, Windows, macOS, Linux
 - **📱 Screen Utilities**: Device and context-aware screen dimension utilities
 - **💾 Storage Management**: Persistent file storage with error handling
 - **📊 Data Formatting**: Time, date, and number formatting with Chinese locale support
 - **🌐 Network Operations**: HTTP client with Bearer token authentication
-- **🧪 Comprehensive Testing**: 44+ unit tests ensuring reliability
+- **🧪 Comprehensive Testing**: 41+ unit tests ensuring reliability
 
 ## 🚀 Quick Start
 
@@ -39,7 +41,7 @@ Add `eggybyte_core` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  eggybyte_core: ^1.0.3
+  eggybyte_core: ^1.0.4
 ```
 
 Then run:
@@ -122,15 +124,17 @@ void showPlatformInfo() {
 LoggingUtils.info('Info message with *bold* keywords');
 LoggingUtils.warning('Warning message');
 LoggingUtils.error('Error message', stackTrace: StackTrace.current);
-LoggingUtils.debug('Debug information');
+LoggingUtils.debug('Debug information'); // Only outputs in debug mode (kDebugMode)
 
-// Native platform logging
-LoggingUtils.nativeInfo('iOS operation', platformPrefix: 'IOS NATIVE');
-LoggingUtils.nativeError('Android error', platformPrefix: 'ANDROID NATIVE');
+// Native platform logging - automatically uses platform prefix
+LoggingUtils.nativeInfo('iOS operation'); // Automatically gets platform prefix
+LoggingUtils.nativeError('Android error', platformPrefix: 'CUSTOM NATIVE'); // Override if needed
 
 // Configure formatting (colors automatically disabled on iOS debug)
 LoggingUtils.configureFormatting(enableColors: true, enableBold: true);
 ```
+
+**✨ Debug Optimization (New in v1.0.4)**: Debug logs are automatically suppressed in release builds for optimal performance.
 
 ### 🌐 NetworkUtils - HTTP Client
 
@@ -138,7 +142,7 @@ LoggingUtils.configureFormatting(enableColors: true, enableBold: true);
 // Bearer token management
 NetworkUtils.setBearerToken('your_api_token');
 
-// HTTP requests
+// HTTP requests with full response logging
 try {
   final response = await NetworkUtils.get(
     'https://api.example.com/data',
@@ -146,6 +150,7 @@ try {
     queryParameters: {'page': '1', 'limit': '10'},
   );
   LoggingUtils.info('Response: ${response.statusCode}');
+  // Complete response body is now logged for debugging (v1.0.4+)
 } catch (e) {
   LoggingUtils.error('Request failed: $e');
 }
@@ -158,6 +163,8 @@ final postResponse = await NetworkUtils.post(
 
 NetworkUtils.clearBearerToken();
 ```
+
+**🔍 Enhanced Debugging (New in v1.0.4)**: HTTP responses are now logged in full without character limits for comprehensive debugging.
 
 ### 📱 ScreenUtils - Screen Dimensions
 
@@ -229,7 +236,19 @@ void formattingExamples() {
 }
 ```
 
-## 🔧 Migration from v1.0.2
+## 🔧 Migration Guide
+
+### From v1.0.3 to v1.0.4
+
+**No breaking changes** - this is a feature enhancement release:
+
+✅ **Enhanced Debugging**: Debug logs now automatically respect debug/release mode
+✅ **Better Network Debugging**: Full HTTP response logging
+✅ **Improved Performance**: Debug logs are skipped in release builds
+
+No code changes required for existing implementations.
+
+### From v1.0.2 to v1.0.3+
 
 If you're upgrading from v1.0.2, here's how to migrate:
 
@@ -258,7 +277,7 @@ flutter test
 ```
 
 **Test Coverage:**
-- ✅ 44+ unit tests
+- ✅ 41+ unit tests
 - ✅ Automatic platform detection
 - ✅ Logging system with native platform support
 - ✅ All utility modules (Format, Network, Storage, Screen)
