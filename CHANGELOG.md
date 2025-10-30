@@ -1,3 +1,58 @@
+## 1.1.0
+
+### Added
+- **Enhanced Network Utils**:
+  - Added `PUT`, `DELETE`, `PATCH`, and `HEAD` HTTP methods to `NetworkUtils`
+  - Comprehensive error handling with custom exception types
+  - Better request/response logging with improved error context
+- **Custom Network Exceptions**:
+  - `NetworkException`: Base exception class for all network-related errors
+  - `HttpException`: Exception for HTTP errors with status code checking (e.g., `isUnauthorized`, `isNotFound`)
+  - `NetworkConnectionException`: Exception for connectivity issues
+  - `NetworkTimeoutException`: Exception for request timeouts
+- **Enhanced Storage Utils**:
+  - `fileExists()`: Check if a file exists in the app's documents directory
+  - `getFileSize()`: Get file size in bytes
+  - `listFiles()`: List all files in the directory with optional pattern filtering (e.g., `*.json`)
+- **Enhanced Format Utils**:
+  - `formatCurrency()`: Format numbers as currency with customizable symbol and locale
+  - `formatFileSize()`: Format file sizes in human-readable format (B, KB, MB, GB, TB, PB)
+  - `formatDuration()`: Format Duration objects to human-readable strings (e.g., "1h 30m 45s")
+
+### Changed
+- **ScreenUtils Modernization**:
+  - Replaced deprecated `implicitView` API with `PlatformDispatcher.instance.views`
+  - Added robust error handling and fallback mechanisms
+  - Improved null safety and error recovery
+- **Code Quality Enhancements**:
+  - Enhanced `analysis_options.yaml` with comprehensive lint rules
+  - Added strict type checking and code quality standards
+  - Improved code organization and maintainability
+- **Network Error Handling**:
+  - All HTTP methods now throw typed exceptions (`HttpException`, `NetworkException`, etc.)
+  - Better error messages with request context (URL, status code, response body)
+  - Improved debugging experience with detailed error information
+- **Logging Format**:
+  - Removed timestamp from log output format for cleaner, more concise logs
+  - Log format changed from `time [LOG_TYPE] message` to `[LOG_TYPE] message`
+  - Maintains all existing functionality while improving readability
+- **Documentation Improvements**:
+  - Added comprehensive English documentation for all classes, methods, and variables
+  - Every public API now includes detailed parameter descriptions, return values, exceptions, and usage examples
+  - Enhanced inline comments explaining implementation details and design decisions
+  - Improved code maintainability through better documentation standards
+
+### Fixed
+- Fixed deprecated API usage in `ScreenUtils` for Flutter 3.13+ compatibility
+- Improved error handling in all utility classes
+- Fixed import statements to use package imports instead of relative imports
+
+### Technical Improvements
+- Updated to Dart 3.0+ and Flutter 3.0+ standards
+- Enhanced documentation with comprehensive examples
+- Improved type safety throughout the codebase
+- Better alignment with Flutter best practices
+
 ## 1.0.4
 
 ### Changed

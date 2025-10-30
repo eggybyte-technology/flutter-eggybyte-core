@@ -23,14 +23,15 @@ A foundational Flutter package providing essential utilities and core functional
 ## ✨ Key Features
 
 - **🚀 One-Line Initialization**: Automatic platform detection and optimal configuration
-- **🎯 Smart Logging**: Platform-aware logging with automatic ANSI escape sequence handling
+- **🎯 Smart Logging**: Platform-aware logging with automatic ANSI escape sequence handling (no timestamp for cleaner output)
 - **🔍 Optimized Debug Output**: Debug logs only appear in debug mode for better performance
 - **📋 Complete Network Debugging**: Full HTTP response logging for comprehensive debugging
 - **🌐 Universal Platform Support**: Android, iOS, Web, Windows, macOS, Linux
 - **📱 Screen Utilities**: Device and context-aware screen dimension utilities
 - **💾 Storage Management**: Persistent file storage with error handling
-- **📊 Data Formatting**: Time, date, and number formatting with Chinese locale support
-- **🌐 Network Operations**: HTTP client with Bearer token authentication
+- **📊 Data Formatting**: Time, date, number, currency, file size, and duration formatting with Chinese locale support
+- **🌐 Network Operations**: Complete HTTP client (GET, POST, PUT, DELETE, PATCH, HEAD) with Bearer token authentication and typed exceptions
+- **📚 Comprehensive Documentation**: Detailed English documentation for all APIs with examples and implementation notes
 - **🧪 Comprehensive Testing**: 41+ unit tests ensuring reliability
 
 ## 🚀 Quick Start
@@ -41,7 +42,7 @@ Add `eggybyte_core` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  eggybyte_core: ^1.0.4
+  eggybyte_core: ^1.1.0
 ```
 
 Then run:
@@ -67,6 +68,8 @@ void main() {
 ```dart
 void exampleUsage() {
   // Logging - automatically configured for your platform
+  // Note: Logs no longer include timestamps for cleaner output (v1.1.0+)
+  // Format: [LOG_TYPE] message
   LoggingUtils.info('Application started successfully');
   LoggingUtils.warning('This is a warning message');
   LoggingUtils.error('Error occurred', stackTrace: StackTrace.current);
@@ -161,10 +164,54 @@ final postResponse = await NetworkUtils.post(
   body: {'name': 'EggyByte', 'type': 'technology'},
 );
 
+// PUT request (Update)
+final putResponse = await NetworkUtils.put(
+  'https://api.example.com/users/123',
+  body: {'name': 'Updated Name'},
+);
+
+// PATCH request (Partial update)
+final patchResponse = await NetworkUtils.patch(
+  'https://api.example.com/users/123',
+  body: {'email': 'new@example.com'},
+);
+
+// DELETE request
+final deleteResponse = await NetworkUtils.delete(
+  'https://api.example.com/users/123',
+);
+
+// HEAD request (Check if resource exists)
+final headResponse = await NetworkUtils.head(
+  'https://api.example.com/resource',
+);
+
 NetworkUtils.clearBearerToken();
 ```
 
+**🛡️ Error Handling (New in v1.1.0)**:
+```dart
+try {
+  final response = await NetworkUtils.get('https://api.example.com/data');
+  print('Success: ${response.body}');
+} on HttpException catch (e) {
+  if (e.isUnauthorized) {
+    print('Authentication required');
+  } else if (e.isNotFound) {
+    print('Resource not found');
+  } else {
+    print('HTTP error ${e.statusCode}: ${e.message}');
+  }
+} on NetworkConnectionException catch (e) {
+  print('No internet connection: ${e.message}');
+} on NetworkException catch (e) {
+  print('Network error: ${e.message}');
+}
+```
+
 **🔍 Enhanced Debugging (New in v1.0.4)**: HTTP responses are now logged in full without character limits for comprehensive debugging.
+
+**🚀 New in v1.1.0**: Added PUT, DELETE, PATCH, HEAD methods with comprehensive error handling using typed exceptions.
 
 ### 📱 ScreenUtils - Screen Dimensions
 
@@ -196,11 +243,29 @@ Future<void> storageExample() async {
     await StorageUtils.saveToFile('user_data.json', '{"name": "EggyByte"}');
     LoggingUtils.info('Data saved successfully');
     
+    // Check if file exists (New in v1.1.0)
+    final exists = await StorageUtils.fileExists('user_data.json');
+    LoggingUtils.info('File exists: *$exists*');
+    
+    // Get file size (New in v1.1.0)
+    final size = await StorageUtils.getFileSize('user_data.json');
+    if (size != null) {
+      LoggingUtils.info('File size: *$size* bytes');
+    }
+    
     // Read data
     final content = await StorageUtils.readFromFile('user_data.json');
     if (content != null) {
       LoggingUtils.info('Read data: *$content*');
     }
+    
+    // List all files (New in v1.1.0)
+    final allFiles = await StorageUtils.listFiles();
+    LoggingUtils.info('Found *${allFiles.length}* files');
+    
+    // List files matching pattern (New in v1.1.0)
+    final jsonFiles = await StorageUtils.listFiles(pattern: '*.json');
+    LoggingUtils.info('Found *${jsonFiles.length}* JSON files');
     
     // Delete file
     final deleted = await StorageUtils.deleteFile('user_data.json');
@@ -232,11 +297,51 @@ void formattingExamples() {
   final withUnits = FormatUtils.formatNumberWithUnits(12345); // "1.23万"
   final bigNumber = FormatUtils.formatNumberWithUnits(123456789); // "1.23亿"
   
+  // Currency formatting (New in v1.1.0)
+  final currency = FormatUtils.formatCurrency(1234.56); // "¥1,234.56"
+  final usdCurrency = FormatUtils.formatCurrency(1234.56, currencySymbol: '\$'); // "\$1,234.56"
+  
+  // File size formatting (New in v1.1.0)
+  final fileSize1 = FormatUtils.formatFileSize(1024); // "1.00 KB"
+  final fileSize2 = FormatUtils.formatFileSize(1048576); // "1.00 MB"
+  final fileSize3 = FormatUtils.formatFileSize(1536, decimalPlaces: 1); // "1.5 KB"
+  
+  // Duration formatting (New in v1.1.0)
+  final duration1 = FormatUtils.formatDuration(Duration(hours: 1, minutes: 30, seconds: 45)); // "1h 30m 45s"
+  final duration2 = FormatUtils.formatDuration(Duration(minutes: 30, seconds: 15)); // "30m 15s"
+  final duration3 = FormatUtils.formatDuration(
+    Duration(milliseconds: 1234),
+    showMilliseconds: true,
+  ); // "1s 234ms"
+  
   LoggingUtils.info('Formatted: time=*$timeChinese*, date=*$dateChinese*, number=*$withUnits*');
+  LoggingUtils.info('Currency: *$currency*, File size: *$fileSize2*, Duration: *$duration1*');
 }
 ```
 
 ## 🔧 Migration Guide
+
+### From v1.0.4 to v1.1.0
+
+**No breaking changes** - this is a feature enhancement release:
+
+✅ **New HTTP Methods**: Added PUT, DELETE, PATCH, HEAD methods
+✅ **Enhanced Error Handling**: All HTTP methods now throw typed exceptions for better error handling
+✅ **Storage Utilities**: Added fileExists(), getFileSize(), listFiles() methods
+✅ **Format Utilities**: Added formatCurrency(), formatFileSize(), formatDuration() methods
+✅ **ScreenUtils Modernization**: Fixed deprecated API usage for Flutter 3.13+ compatibility
+✅ **Logging Format**: Removed timestamps from log output for cleaner, more concise logs
+✅ **Documentation**: Comprehensive English documentation added for all APIs
+
+**Log Format Change**:
+- **Old format**: `HH:mm:ss.SSS [LOG_TYPE] message`
+- **New format**: `[LOG_TYPE] message`
+- Timestamps have been removed for cleaner output. All functionality remains the same.
+
+**Recommended Migration**:
+- Update error handling to use new typed exceptions (`HttpException`, `NetworkException`, etc.)
+- Take advantage of new storage and formatting utilities for improved functionality
+- Note: Log format no longer includes timestamps (behavior change, not breaking API change)
 
 ### From v1.0.3 to v1.0.4
 
@@ -318,6 +423,25 @@ flutter test
 | `debug(String message)` | Log debug message |
 | `nativeInfo/Warning/Error/Debug(String message, {String? platformPrefix})` | Platform-specific native logging |
 
+### NetworkUtils
+
+| Method | Description |
+|--------|-------------|
+| `get(url, {headers, queryParameters})` | Performs a GET request |
+| `post(url, {headers, body, queryParameters})` | Performs a POST request |
+| `put(url, {headers, body, queryParameters})` | Performs a PUT request (New in v1.1.0) |
+| `patch(url, {headers, body, queryParameters})` | Performs a PATCH request (New in v1.1.0) |
+| `delete(url, {headers, queryParameters})` | Performs a DELETE request (New in v1.1.0) |
+| `head(url, {headers, queryParameters})` | Performs a HEAD request (New in v1.1.0) |
+| `setBearerToken(token)` | Sets the global Bearer token for API requests |
+| `clearBearerToken()` | Clears the global Bearer token |
+
+**Exceptions** (New in v1.1.0):
+- `HttpException`: HTTP errors with status code checking (`isUnauthorized`, `isNotFound`, etc.)
+- `NetworkException`: Base exception for network-related errors
+- `NetworkConnectionException`: Connectivity issues
+- `NetworkTimeoutException`: Request timeouts
+
 ### FormatUtils
 
 | Method | Description |
@@ -328,6 +452,20 @@ flutter test
 | `formatDateChineseSeparated(DateTime date)` | Format date in Chinese style |
 | `formatNumberDecimalPlaces(double number, int decimalPlaces)` | Format number with specific decimal places |
 | `formatNumberWithUnits(double number, {int decimalPlaces = 2})` | Format number with Chinese units (万, 亿) |
+| `formatCurrency(double amount, {String currencySymbol, String locale, int decimalPlaces})` | Format number as currency (New in v1.1.0) |
+| `formatFileSize(int bytes, {int decimalPlaces = 2})` | Format file size in human-readable format (New in v1.1.0) |
+| `formatDuration(Duration duration, {bool showSeconds, bool showMilliseconds})` | Format duration to human-readable string (New in v1.1.0) |
+
+### StorageUtils
+
+| Method | Description |
+|--------|-------------|
+| `saveToFile(String fileName, String content)` | Persistently saves string content to a file |
+| `readFromFile(String fileName)` | Reads and returns string content from a file |
+| `deleteFile(String fileName)` | Deletes a specified file |
+| `fileExists(String fileName)` | Checks if a file exists (New in v1.1.0) |
+| `getFileSize(String fileName)` | Gets the size of a file in bytes (New in v1.1.0) |
+| `listFiles({String? pattern})` | Lists all files in the directory with optional pattern filtering (New in v1.1.0) |
 
 ## 🤝 Contributing
 
