@@ -23,7 +23,7 @@ A foundational Flutter package providing essential utilities and core functional
 ## ✨ Key Features
 
 - **🚀 One-Line Initialization**: Automatic platform detection and optimal configuration
-- **🎯 Smart Logging**: Platform-aware logging with automatic ANSI escape sequence handling (no timestamp for cleaner output)
+- **🎯 Smart Logging**: Platform-aware logging with automatic ANSI escape sequence handling (no timestamp for cleaner output, colors disabled by default on non-web platforms)
 - **🔍 Optimized Debug Output**: Debug logs only appear in debug mode for better performance
 - **📋 Complete Network Debugging**: Full HTTP response logging for comprehensive debugging
 - **🌐 Universal Platform Support**: Android, iOS, Web, Windows, macOS, Linux
@@ -42,7 +42,7 @@ Add `eggybyte_core` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  eggybyte_core: ^1.1.0
+  eggybyte_core: ^1.1.1
 ```
 
 Then run:
@@ -70,6 +70,7 @@ void exampleUsage() {
   // Logging - automatically configured for your platform
   // Note: Logs no longer include timestamps for cleaner output (v1.1.0+)
   // Format: [LOG_TYPE] message
+  // Use standard string interpolation: 'Value: $value'
   LoggingUtils.info('Application started successfully');
   LoggingUtils.warning('This is a warning message');
   LoggingUtils.error('Error occurred', stackTrace: StackTrace.current);
@@ -86,7 +87,7 @@ void exampleUsage() {
   // Number formatting with Chinese units
   final formattedNumber = FormatUtils.formatNumberWithUnits(12345); // "1.23万"
   
-  LoggingUtils.info('Formatted time: *$chineseTime*, number: *$formattedNumber*');
+  LoggingUtils.info('Formatted time: $chineseTime, number: $formattedNumber');
 }
 ```
 
@@ -114,7 +115,7 @@ void showPlatformInfo() {
   final platform = EggyByteCore.getTargetPlatform(); // Auto-detected: android, ios, web, etc.
   final prefix = EggyByteCore.getPlatformPrefix();   // e.g., "IOS NATIVE"
   
-  LoggingUtils.info('Running on: *${platform?.name.toUpperCase()}*');
+  LoggingUtils.info('Running on: ${platform?.name.toUpperCase()}');
 }
 ```
 
@@ -124,7 +125,7 @@ void showPlatformInfo() {
 
 ```dart
 // Basic logging
-LoggingUtils.info('Info message with *bold* keywords');
+LoggingUtils.info('Info message with variables: $value');
 LoggingUtils.warning('Warning message');
 LoggingUtils.error('Error message', stackTrace: StackTrace.current);
 LoggingUtils.debug('Debug information'); // Only outputs in debug mode (kDebugMode)
@@ -245,31 +246,31 @@ Future<void> storageExample() async {
     
     // Check if file exists (New in v1.1.0)
     final exists = await StorageUtils.fileExists('user_data.json');
-    LoggingUtils.info('File exists: *$exists*');
+    LoggingUtils.info('File exists: $exists');
     
     // Get file size (New in v1.1.0)
     final size = await StorageUtils.getFileSize('user_data.json');
     if (size != null) {
-      LoggingUtils.info('File size: *$size* bytes');
+      LoggingUtils.info('File size: $size bytes');
     }
     
     // Read data
     final content = await StorageUtils.readFromFile('user_data.json');
     if (content != null) {
-      LoggingUtils.info('Read data: *$content*');
+      LoggingUtils.info('Read data: $content');
     }
     
     // List all files (New in v1.1.0)
     final allFiles = await StorageUtils.listFiles();
-    LoggingUtils.info('Found *${allFiles.length}* files');
+    LoggingUtils.info('Found ${allFiles.length} files');
     
     // List files matching pattern (New in v1.1.0)
     final jsonFiles = await StorageUtils.listFiles(pattern: '*.json');
-    LoggingUtils.info('Found *${jsonFiles.length}* JSON files');
+    LoggingUtils.info('Found ${jsonFiles.length} JSON files');
     
     // Delete file
     final deleted = await StorageUtils.deleteFile('user_data.json');
-    LoggingUtils.info('File deleted: *$deleted*');
+    LoggingUtils.info('File deleted: $deleted');
   } catch (e) {
     LoggingUtils.error('Storage operation failed: $e');
   }
@@ -314,8 +315,8 @@ void formattingExamples() {
     showMilliseconds: true,
   ); // "1s 234ms"
   
-  LoggingUtils.info('Formatted: time=*$timeChinese*, date=*$dateChinese*, number=*$withUnits*');
-  LoggingUtils.info('Currency: *$currency*, File size: *$fileSize2*, Duration: *$duration1*');
+  LoggingUtils.info('Formatted: time=$timeChinese, date=$dateChinese, number=$withUnits');
+  LoggingUtils.info('Currency: $currency, File size: $fileSize2, Duration: $duration1');
 }
 ```
 

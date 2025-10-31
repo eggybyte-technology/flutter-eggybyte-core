@@ -1,3 +1,45 @@
+## 1.1.1
+
+### Changed
+- **Platform-Aware Color Output Enhancement**:
+  - Colors are now automatically disabled for non-web platforms in `EggyByteCore.initialize()`
+  - Improved `_shouldEnableColors()` method to automatically check `kIsWeb` platform
+  - Default color setting changed to `false` to prevent ANSI escape sequence display issues on native platforms
+  - Colors are automatically enabled only for web platforms, preventing garbled text in iOS/Android console logs
+
+### Fixed
+- Fixed ANSI escape sequence display issues on non-web platforms (iOS, Android) by defaulting colors to disabled
+- Improved automatic platform detection for color output configuration
+
+### Technical Improvements
+- Better platform-aware initialization defaults
+- Enhanced developer experience with automatic platform optimization
+
+## 1.2.0
+
+### Changed
+- **Simplified Logging System**:
+  - Removed support for asterisk-based formatting (`*text*`) to simplify API
+  - LoggingUtils now accepts fully interpolated strings only (e.g., `'Value: $value'`)
+  - Eliminated complex string parsing and formatting logic
+  - Improved performance by removing regex processing
+- **Platform-Aware Color Output**:
+  - Colors disabled by default (`_enableColors = false`) to prevent ANSI escape sequence issues on non-web platforms
+  - Colors are only enabled when explicitly configured via `configureFormatting()` for web platforms
+  - Fixed color escape sequence display issues on iOS/Android debug consoles
+  - Removed unused `_ansiBold` constant
+
+### Fixed
+- Fixed color escape sequence display issues on iOS/Android platforms (now disabled by default)
+- Fixed variable interpolation issues in log messages (removed `*$variable*` format support)
+- Improved log output reliability across all platforms
+
+### Technical Improvements
+- Simplified logging implementation for better maintainability
+- Reduced code complexity by removing format string processing
+- Better alignment with Flutter's standard logging patterns
+- Enhanced developer experience with straightforward string interpolation
+
 ## 1.1.0
 
 ### Added

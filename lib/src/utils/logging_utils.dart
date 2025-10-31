@@ -20,10 +20,6 @@ const String _ansiBrightYellow = '\x1B[93m';
 /// Provides visual distinction for debug-level logging to improve readability.
 const String _ansiBrightBlue = '\x1B[94m';
 
-/// ANSI escape code to apply bold text formatting.
-/// Used to emphasize important keywords within log messages using markdown-like syntax (*text*).
-const String _ansiBold = '\x1B[1m';
-
 /// Enumeration defining the available log severity levels.
 ///
 /// Each log type corresponds to a different severity level:
@@ -72,24 +68,21 @@ class LoggingUtils {
 
   /// Flag indicating whether ANSI color codes should be enabled in log output.
   ///
-  /// When `true`, log messages will include color formatting based on log type:
-  /// - INFO: green
-  /// - WARNING: yellow
-  /// - ERROR: red
-  /// - DEBUG: blue
+  /// When `true`, log messages will include ANSI escape sequences for color formatting.
+  /// When `false`, all logs will be plain text without color formatting.
   ///
-  /// Defaults to `true` but can be disabled via [configureFormatting] for
-  /// environments that don't support ANSI colors (e.g., iOS debug console).
-  static bool _enableColors = true;
+  /// Defaults to `false` to avoid color escape sequences in non-web platforms.
+  /// Can be enabled via [configureFormatting] for web platforms or terminals that support colors.
+  static bool _enableColors = false;
 
   /// Flag indicating whether bold text formatting should be enabled in log output.
   ///
-  /// When `true`, text wrapped in asterisks (*text*) will be formatted as bold.
-  /// When `false`, asterisks will be removed or replaced with markdown syntax.
+  /// This flag is kept for API compatibility but is no longer used since
+  /// we removed asterisk-based formatting support.
   ///
-  /// Defaults to `true` but can be disabled via [configureFormatting] for
-  /// environments that don't support ANSI escape sequences.
-  static bool _enableBold = true;
+  /// Defaults to `false`.
+  // ignore: unused_field
+  static bool _enableBold = false;
 
   /// Optional function that provides the platform prefix for native logging.
   ///
@@ -154,23 +147,22 @@ class LoggingUtils {
   ///
   /// Log Format:
   /// - `[LOG_TYPE]`: The log type (INFO, WARNING, ERROR, DEBUG) displayed in brackets
-  /// - `message`: The log content. Important keywords can be emphasized using markdown-like
-  ///   syntax: wrap text in asterisks (*text*) to make it bold (if bold formatting is enabled)
+  /// - `message`: The log content. Should be a fully interpolated string with all variables already resolved.
   ///
   /// Special Handling:
   /// - DEBUG logs: Only output when running in debug mode (`kDebugMode`). Skipped in release builds.
   /// - ERROR logs: If a [stackTrace] is provided, it will be printed separately after the error message.
   ///
   /// Parameters:
-  /// - [message]: The log message to output. Can contain asterisks (*text*) for bold formatting.
+  /// - [message]: The log message to output. Should be a fully interpolated string (e.g., 'Value: $value').
   /// - [type]: The log severity level. Defaults to [LogType.info].
   /// - [stackTrace]: Optional stack trace to include with error logs for debugging purposes.
   ///
   /// Example:
   /// ```dart
   /// LoggingUtils.log('Application started', type: LogType.info);
-  /// LoggingUtils.log('This is *important*', type: LogType.warning);
-  /// LoggingUtils.log('Error occurred', type: LogType.error, stackTrace: StackTrace.current);
+  /// LoggingUtils.log('User logged in: $username', type: LogType.info);
+  /// LoggingUtils.log('Error occurred: $error', type: LogType.error, stackTrace: StackTrace.current);
   /// ```
   static void log(
     String message, {
@@ -185,11 +177,8 @@ class LoggingUtils {
     // Extract the log type name (e.g., "info", "warning") and convert to uppercase
     final String logTypeString = type.toString().split('.').last.toUpperCase();
 
-    // Variables to hold formatted log components
-    String logColorCode;
-    String coloredLogTypeMessage;
-
     // Determine the appropriate ANSI color code based on log type
+    String logColorCode;
     switch (type) {
       case LogType.info:
         logColorCode = _ansiBrightGreen;
@@ -205,45 +194,20 @@ class LoggingUtils {
         break;
     }
 
+    // Construct the log message with optional color formatting
+    String formattedMessage;
     if (_enableColors) {
-      // Process bold formatting: Replace asterisks (*text*) with ANSI bold codes
-      // After applying bold, we need to reapply the log color so the rest of
-      // the message maintains the log type color
-      if (_enableBold) {
-        message = message.replaceAllMapped(RegExp(r'\*(.*?)\*'), (match) {
-          final String? matchedGroup = match.group(1);
-          if (matchedGroup != null && matchedGroup.isNotEmpty) {
-            // Apply bold format, then content, then reset bold, then reapply log color
-            return '$_ansiBold$matchedGroup$_ansiReset$logColorCode';
-          }
-          return '';
-        });
-      } else {
-        // Remove asterisks without applying bold formatting when bold is disabled
-        message = message.replaceAll(RegExp(r'\*(.*?)\*'), r'$1');
-      }
-
-      // Construct the final colored log message with log type in brackets
-      coloredLogTypeMessage =
-          '$logColorCode[$logTypeString] $message$_ansiReset';
+      // Apply color to log type and message
+      formattedMessage = '$logColorCode[$logTypeString] $message$_ansiReset';
     } else {
       // Plain text mode: No ANSI escape codes
-      if (_enableBold) {
-        // Convert asterisks to markdown-style bold (**text**) for plain text
-        message = message.replaceAll(RegExp(r'\*(.*?)\*'), r'**$1**');
-      } else {
-        // Remove asterisks completely when both colors and bold are disabled
-        message = message.replaceAll(RegExp(r'\*(.*?)\*'), r'$1');
-      }
-
-      // Construct plain text log message with log type in brackets
-      coloredLogTypeMessage = '[$logTypeString] $message';
+      formattedMessage = '[$logTypeString] $message';
     }
 
     // Output the formatted log message to console
     // Using print for Flutter console output
     // ignore: avoid_print
-    print(coloredLogTypeMessage);
+    print(formattedMessage);
 
     // Handle error-specific logging: Print stack trace if provided
     if (type == LogType.error && stackTrace != null) {
@@ -323,12 +287,12 @@ class LoggingUtils {
   /// Equivalent to calling [log] with [LogType.info].
   ///
   /// Parameters:
-  /// - [message]: The informational message to log. Can contain asterisks (*text*) for bold formatting.
+  /// - [message]: The informational message to log. Should be a fully interpolated string.
   ///
   /// Example:
   /// ```dart
   /// LoggingUtils.info('Application started successfully');
-  /// LoggingUtils.info('User logged in: *username*');
+  /// LoggingUtils.info('User logged in: $username');
   /// ```
   static void info(String message) {
     log(message, type: LogType.info);

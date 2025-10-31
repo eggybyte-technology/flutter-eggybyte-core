@@ -18,7 +18,7 @@ export 'src/exceptions/network_exceptions.dart';
 import 'src/utils/logging_utils.dart';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart'
-    show kIsWeb, kDebugMode, defaultTargetPlatform, TargetPlatform;
+    show kIsWeb, defaultTargetPlatform, TargetPlatform;
 
 /// Main configuration class for EggyByte Core
 class EggyByteCore {
@@ -46,7 +46,7 @@ class EggyByteCore {
     // Automatically detect platform
     _targetPlatform = _detectCurrentPlatform();
     LoggingUtils.info(
-        'Platform auto-detected: *${_targetPlatform!.name.toUpperCase()}*');
+        'Platform auto-detected: ${_targetPlatform!.name.toUpperCase()}');
 
     // Set platform prefix provider for LoggingUtils
     LoggingUtils.setPlatformPrefixProvider(() => getPlatformPrefix());
@@ -61,7 +61,7 @@ class EggyByteCore {
     );
 
     LoggingUtils.info(
-      'EggyByte Core initialized - Platform: *${_targetPlatform!.name.toUpperCase()}*, Colors: *$autoEnableColors*, Bold: *$autoEnableBold*',
+      'EggyByte Core initialized - Platform: ${_targetPlatform!.name.toUpperCase()}, Colors: $autoEnableColors, Bold: $autoEnableBold',
     );
 
     _isInitialized = true;
@@ -101,7 +101,7 @@ class EggyByteCore {
       enableBold: enableBold,
     );
     LoggingUtils.info(
-      'Logging reconfigured - Colors: *$enableColors*, Bold: *$enableBold*',
+      'Logging reconfigured - Colors: $enableColors, Bold: $enableBold',
     );
   }
 
@@ -133,22 +133,30 @@ class EggyByteCore {
   }
 
   /// Determines if colors should be enabled based on platform and environment
+  ///
+  /// Returns `true` only for web platform, `false` for all other platforms
+  /// (iOS, Android, Windows, macOS, Linux) to prevent ANSI escape sequence
+  /// display issues in native console outputs.
   static bool _shouldEnableColors() {
-    // Disable colors on iOS debug to avoid ANSI escape sequences in console
-    if (_targetPlatform == TargetPlatform.iOS && kDebugMode) {
-      return false;
+    // Only enable colors on web platform
+    if (kIsWeb) {
+      return true;
     }
-    // Enable colors for all other cases
-    return true;
+    // Disable colors for all native platforms to avoid ANSI escape sequences
+    return false;
   }
 
   /// Determines if bold text should be enabled based on platform and environment
+  ///
+  /// Returns `true` only for web platform, `false` for all other platforms
+  /// (iOS, Android, Windows, macOS, Linux) to prevent ANSI escape sequence
+  /// display issues in native console outputs.
   static bool _shouldEnableBold() {
-    // Disable bold on iOS debug to avoid ANSI escape sequences in console
-    if (_targetPlatform == TargetPlatform.iOS && kDebugMode) {
-      return false;
+    // Only enable bold on web platform
+    if (kIsWeb) {
+      return true;
     }
-    // Enable bold for all other cases
-    return true;
+    // Disable bold for all native platforms to avoid ANSI escape sequences
+    return false;
   }
 }
